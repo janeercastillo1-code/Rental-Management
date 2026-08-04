@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page - Rental Management</title>
+    
+    <!-- Modern Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main class="auth-container">
+        
+        <!-- LOGIN SECTION -->
+        <section id="loginSection" class="form-section active">
+            <header class="auth-header">
+                <div class="logo-badge">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <h1>Rental Management</h1>
+                <h2>Welcome back</h2>
+                <p>Please enter your details to sign in.</p>
+            </header>
+
+            <form id="loginForm" novalidate>
+                <div class="input-group">
+                    <label for="loginEmail">Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="name@example.com" autocomplete="email" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="loginPassword" placeholder="At least 8 characters" autocomplete="current-password" required>
+                        <button type="button" class="toggle-password" aria-label="Toggle password visibility" data-target="loginPassword">
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember">
+                        <span class="custom-checkbox"></span>
+                        <span class="label-text">Remember for 30 days</span>
+                    </label>
+                    <a href="#" class="forgot-password">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="auth-btn">Sign In</button>
+            </form>
+
+            <footer class="auth-footer">
+                <p>Don't have an account? <button type="button" id="showSignup" class="text-btn">Sign up</button></p>
+            </footer>
+        </section>
+
+        <!-- SIGN UP SECTION -->
+        <section id="signupSection" class="form-section hidden">
+            <header class="auth-header">
+                <div class="logo-badge">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <h1>Rental Management</h1>
+                <h2>Create an account</h2>
+                <p>Please enter your details to get started.</p>
+            </header>
+
+            <form id="signupForm" novalidate>
+                <div class="input-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" placeholder="Juan Dela Cruz" autocomplete="name" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="signupEmail">Email Address</label>
+                    <input type="email" id="signupEmail" placeholder="name@example.com" autocomplete="email" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="Cpnumber">CellPhone Number </label>
+                    <input type="tel" id="Cpnumber" placeholder="1234-567-8901" autocomplete="tel" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="signupPassword">Password</label>
+                    <div class="password-wrapper">
+                        <input type="password" id="signupPassword" placeholder="At least 8 characters" autocomplete="new-password" required>
+                        <button type="button" class="toggle-password" aria-label="Toggle password visibility" data-target="signupPassword">
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn">Create Account</button>
+            </form>
+
+            <footer class="auth-footer">
+                <p>Already have an account? <button type="button" id="showLogin" class="text-btn">Sign in</button></p>
+            </footer>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
