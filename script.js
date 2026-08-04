@@ -1,9 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Session and Auth Elements
     const authContainer = document.getElementById("authContainer");
     const fullDashboard = document.getElementById("fullDashboard");
     const loginSection = document.getElementById("loginSection");
     const signupSection = document.getElementById("signupSection");
-    
     const showSignupBtn = document.getElementById("showSignup");
     const showLoginBtn = document.getElementById("showLogin");
 
@@ -17,13 +17,96 @@ document.addEventListener("DOMContentLoaded", () => {
     const actionModal = document.getElementById("actionModal");
     const modalTitle = document.getElementById("modalTitle");
     const modalInput = document.getElementById("modalInput");
+    const statusGroup = document.getElementById("statusGroup");
+    const modalStatus = document.getElementById("modalStatus");
     const closeModalBtn = document.getElementById("closeModalBtn");
     const saveModalBtn = document.getElementById("saveModalBtn");
 
-    let currentTargetList = null;
-    let editingElement = null;
+    // Data Storage Structure (Starts empty)
+    let appData = {
+        properties: [],
+        units: [],
+        tenants: [],
+        rentals: [],
+        transactions: []
+    };
 
-    // Toggle Form Views inside Auth Card
+    let activeCategoryKey = null;
+    let editIndex = null;
+
+    // Load persisted data from LocalStorage
+    const loadSavedData = () => {
+        const storedData = localStorage.getItem("rental_app_data");
+        if (storedData) {
+            try { appData = JSON.parse(storedData); } catch(e) {}
+        }
+        renderAllLists();
+        updateStats();
+    };
+
+    const saveData = () => {
+        localStorage.setItem("rental_app_data", JSON.stringify(appData));
+        renderAllLists();
+        updateStats();
+    };
+
+    // Calculate and update top stats automatically
+    const updateStats = () => {
+        document.getElementById("statProperties").textContent = appData.properties.length;
+        document.getElementById("statTenants").textContent = appData.tenants.length;
+
+        const occupiedCount = appData.properties.filter(p => p.status === "Occupied").length;
+        document.getElementById("statOccupied").textContent = occupiedCount;
+
+        // Try summing transaction amounts if numbers exist
+        let totalRev = 0;
+        appData.transactions.forEach(t => {
+            const num = parseFloat(t.title.replace(/[^0-9.]/g, ''));
+            if (!isNaN(num)) totalRev += num;
+        });
+        document.getElementById("statRevenue").textContent = `₱${totalRev.toLocaleString()}`;
+    };
+
+    // Render List Items dynamically
+    const renderAllLists = () => {
+        const keys = ['properties', 'units', 'tenants', 'rentals', 'transactions'];
+        keys.forEach(key => {
+            const listEl = document.getElementById(`${key}List`);
+            if (!listEl) return;
+
+            listEl.innerHTML = '';
+            if (appData[key].length === 0) {
+                listEl.innerHTML = `<li class="empty-state">No items added yet. Click "+ Add" above to start.</li>`;
+                return;
+            }
+
+            appData[key].forEach((item, index) => {
+                const li = document.createElement("li");
+                
+                const statusBadge = item.status 
+                    ? `<em class="status ${item.status.toLowerCase()}">${item.status}</em>` 
+                    : '';
+
+                li.innerHTML = `
+                    <span class="item-info">${item.title} ${statusBadge}</span>
+                    <div class="actions">
+                        <button class="action-btn edit-btn" data-key="${key}" data-index="${index}">Edit</button>
+                        <button class="action-btn delete-btn" data-key="${key}" data-index="${index}">Delete</button>
+                    </div>
+                `;
+                listEl.appendChild(li);
+            });
+        });
+    };
+
+    // Check Session on Reload
+    const checkSavedSession = () => {
+        const savedUser = localStorage.getItem("rental_user");
+        if (savedUser) {
+            openDashboard(savedUser);
+        }
+    };
+
     const toggleForm = (hideSection, showSection) => {
         hideSection.classList.add("hidden");
         showSection.classList.remove("hidden");
@@ -32,57 +115,59 @@ document.addEventListener("DOMContentLoaded", () => {
     showSignupBtn.addEventListener("click", () => toggleForm(loginSection, signupSection));
     showLoginBtn.addEventListener("click", () => toggleForm(signupSection, loginSection));
 
-    // Show/Hide Password functionality
-    const passwordToggles = document.querySelectorAll(".toggle-password");
-    passwordToggles.forEach(toggle => {
+    // Password Toggle
+    document.querySelectorAll(".toggle-password").forEach(toggle => {
         toggle.addEventListener("click", () => {
             const targetId = toggle.getAttribute("data-target");
             const input = document.getElementById(targetId);
-
-            if (input.type === "password") {
-                input.type = "text";
-                toggle.textContent = "Hide";
-            } else {
-                input.type = "password";
-                toggle.textContent = "Show";
-            }
+            input.type = input.type === "password" ? "text" : "password";
+            toggle.textContent = input.type === "password" ? "Show" : "Hide";
         });
     });
 
-    // Enter Full Dashboard Mode
     const openDashboard = (userName) => {
+        localStorage.setItem("rental_user", userName);
         authContainer.classList.add("hidden");
         fullDashboard.classList.remove("hidden");
         document.body.classList.remove("login-mode");
         document.body.classList.add("dashboard-mode");
         welcomeUser.textContent = `Welcome back, ${userName}!`;
+        loadSavedData();
     };
 
+    // Form Submissions with validation
     loginForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        const email = document.getElementById("loginEmail").value;
-        if (!email) return;
+        if (!loginForm.checkValidity()) {
+            loginForm.reportValidity();
+            return;
+        }
+        const email = document.getElementById("loginEmail").value.trim();
         openDashboard(email.split('@')[0]);
         loginForm.reset();
     });
 
     signupForm.addEventListener("submit", (e) => {
         e.preventDefault();
-        const name = document.getElementById("signupName").value;
-        if (!name) return;
+        if (!signupForm.checkValidity()) {
+            signupForm.reportValidity();
+            return;
+        }
+        const name = document.getElementById("signupName").value.trim();
         openDashboard(name);
         signupForm.reset();
     });
 
     // Logout
     logoutBtn.addEventListener("click", () => {
+        localStorage.removeItem("rental_user");
         fullDashboard.classList.add("hidden");
         authContainer.classList.remove("hidden");
         document.body.classList.remove("dashboard-mode");
         document.body.classList.add("login-mode");
     });
 
-    // Sidebar Tab Navigation
+    // Sidebar Navigation
     const navButtons = document.querySelectorAll(".nav-btn");
     const tabContents = document.querySelectorAll(".tab-content");
 
@@ -112,68 +197,83 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // --- ADD / EDIT / DELETE FUNCTIONALITY --- //
+    // --- ADD / EDIT / DELETE LISTENERS --- //
 
-    // Handle Delete & Edit button clicks inside lists
     document.addEventListener("click", (e) => {
-        // Delete action
+        // Delete Action
         if (e.target.classList.contains("delete-btn")) {
-            const item = e.target.closest("li");
+            const key = e.target.getAttribute("data-key");
+            const idx = parseInt(e.target.getAttribute("data-index"));
+
             if (confirm("Are you sure you want to delete this item?")) {
-                item.remove();
+                appData[key].splice(idx, 1);
+                saveData();
             }
         }
 
-        // Edit action
+        // Edit Action
         if (e.target.classList.contains("edit-btn")) {
-            const item = e.target.closest("li");
-            const infoSpan = item.querySelector(".item-info");
-            
-            editingElement = infoSpan;
+            activeCategoryKey = e.target.getAttribute("data-key");
+            editIndex = parseInt(e.target.getAttribute("data-index"));
+
+            const item = appData[activeCategoryKey][editIndex];
             modalTitle.textContent = "Edit Item";
-            modalInput.value = infoSpan.textContent.replace("Occupied", "").replace("Vacant", "").trim();
+            modalInput.value = item.title;
+
+            if (activeCategoryKey === "properties") {
+                statusGroup.classList.remove("hidden");
+                modalStatus.value = item.status || "Occupied";
+            } else {
+                statusGroup.classList.add("hidden");
+            }
+
             actionModal.classList.remove("hidden");
         }
 
-        // Add action
+        // Add Action
         if (e.target.classList.contains("add-btn")) {
-            const category = e.target.getAttribute("data-category");
-            const box = e.target.closest(".content-box");
-            currentTargetList = box.querySelector(".data-list");
-            
-            editingElement = null;
-            modalTitle.textContent = `Add New ${category}`;
+            activeCategoryKey = e.target.getAttribute("data-key");
+            const categoryName = e.target.getAttribute("data-category");
+
+            editIndex = null;
+            modalTitle.textContent = `Add New ${categoryName}`;
             modalInput.value = "";
+
+            if (activeCategoryKey === "properties") {
+                statusGroup.classList.remove("hidden");
+            } else {
+                statusGroup.classList.add("hidden");
+            }
+
             actionModal.classList.remove("hidden");
         }
     });
 
-    // Modal Close
     closeModalBtn.addEventListener("click", () => {
         actionModal.classList.add("hidden");
     });
 
-    // Modal Save (Handles both Adding & Editing)
     saveModalBtn.addEventListener("click", () => {
-        const value = modalInput.value.trim();
-        if (!value) return;
+        const titleVal = modalInput.value.trim();
+        if (!titleVal) return;
 
-        if (editingElement) {
-            // Updating existing item
-            editingElement.childNodes[0].textContent = value + " ";
-        } else if (currentTargetList) {
-            // Creating new item
-            const li = document.createElement("li");
-            li.innerHTML = `
-                <span class="item-info">${value}</span>
-                <div class="actions">
-                    <button class="action-btn edit-btn">Edit</button>
-                    <button class="action-btn delete-btn">Delete</button>
-                </div>
-            `;
-            currentTargetList.appendChild(li);
+        const newItemObj = { title: titleVal };
+        if (activeCategoryKey === "properties") {
+            newItemObj.status = modalStatus.value;
         }
 
+        if (editIndex !== null) {
+            // Edit existing
+            appData[activeCategoryKey][editIndex] = newItemObj;
+        } else {
+            // Add new
+            appData[activeCategoryKey].push(newItemObj);
+        }
+
+        saveData();
         actionModal.classList.add("hidden");
     });
+
+    // Initial session check on page load
+    checkSavedSession();
 });

@@ -22,7 +22,6 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* Background mode */
 body.login-mode {
     background: linear-gradient(rgba(10, 15, 30, 0.65), rgba(10, 15, 30, 0.75)), 
                 url('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat fixed;
@@ -39,7 +38,7 @@ body.dashboard-mode {
     min-height: 100vh;
 }
 
-/* Auth Section Styling */
+/* Auth Section */
 .auth-container {
     background: var(--bg-surface);
     backdrop-filter: blur(16px);
@@ -51,9 +50,9 @@ body.dashboard-mode {
     border: 1px solid var(--border-color);
 }
 
-.auth-container.hidden { display: none !important; }
-
-.form-section.hidden { display: none; }
+.auth-container.hidden, .form-section.hidden, .tab-content.hidden, .full-dashboard.hidden, .modal-overlay.hidden, .input-group.hidden { 
+    display: none !important; 
+}
 
 .auth-header {
     text-align: center;
@@ -105,7 +104,7 @@ body.dashboard-mode {
 
 .password-wrapper { position: relative; }
 
-.input-group input {
+.input-group input, .custom-select {
     width: 100%;
     padding: 12px 16px;
     border: 1px solid var(--border-color);
@@ -114,6 +113,11 @@ body.dashboard-mode {
     color: #ffffff;
     background-color: rgba(255, 255, 255, 0.07);
     outline: none;
+}
+
+.custom-select option {
+    background: #0e1a38;
+    color: #fff;
 }
 
 .password-wrapper input { padding-right: 60px; }
@@ -165,6 +169,8 @@ body.dashboard-mode {
     cursor: pointer;
 }
 
+.auth-btn:hover { background-color: var(--primary-hover); }
+
 .auth-footer {
     margin-top: 24px;
     text-align: center;
@@ -180,19 +186,13 @@ body.dashboard-mode {
     cursor: pointer;
 }
 
-/* ========================================= */
-/* FULL SCREEN DASHBOARD STYLES */
-/* ========================================= */
-
+/* Dashboard Layout */
 .full-dashboard {
     display: flex;
     min-height: 100vh;
     width: 100vw;
 }
 
-.full-dashboard.hidden { display: none !important; }
-
-/* Sidebar */
 .sidebar {
     width: 260px;
     background: #0e1a38;
@@ -281,7 +281,6 @@ body.dashboard-mode {
 
 .logout-btn-full:hover { background: rgba(239, 68, 68, 0.2); }
 
-/* Main Content Area */
 .main-dashboard-area {
     flex: 1;
     padding: 36px;
@@ -302,9 +301,6 @@ body.dashboard-mode {
     font-size: 14px;
 }
 
-.tab-content.hidden { display: none !important; }
-
-/* Cards & Content */
 .dashboard-stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -332,7 +328,6 @@ body.dashboard-mode {
     color: var(--text-primary);
 }
 
-/* Box Header with Add Button */
 .content-box {
     background: #0e1a38;
     border: 1px solid var(--border-color);
@@ -349,7 +344,6 @@ body.dashboard-mode {
 
 .box-header h3 { font-size: 16px; }
 
-/* Add Button */
 .add-btn {
     background: #10b981;
     color: white;
@@ -364,7 +358,6 @@ body.dashboard-mode {
 
 .add-btn:hover { background: #059669; }
 
-/* Item List and Action Buttons */
 .data-list {
     list-style: none;
     display: flex;
@@ -372,7 +365,16 @@ body.dashboard-mode {
     gap: 12px;
 }
 
-.data-list li {
+.empty-state {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 24px;
+    font-size: 14px;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.data-list li:not(.empty-state) {
     background: rgba(255, 255, 255, 0.03);
     padding: 12px 16px;
     border-radius: var(--radius-md);
@@ -389,10 +391,7 @@ body.dashboard-mode {
     font-size: 14px;
 }
 
-.actions {
-    display: flex;
-    gap: 8px;
-}
+.actions { display: flex; gap: 8px; }
 
 .action-btn {
     padding: 6px 12px;
@@ -419,7 +418,6 @@ body.dashboard-mode {
 
 .delete-btn:hover { background: rgba(239, 68, 68, 0.3); }
 
-/* Status Badges */
 .status {
     font-style: normal;
     font-size: 11px;
@@ -452,8 +450,6 @@ body.dashboard-mode {
     justify-content: center;
     z-index: 1000;
 }
-
-.modal-overlay.hidden { display: none !important; }
 
 .modal-card {
     background: #0e1a38;

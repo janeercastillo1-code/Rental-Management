@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rental Management</title>
+    <title>Home Page - Rental Management</title>
     
     <!-- Modern Font: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -160,50 +160,28 @@
                 <div class="dashboard-stats-grid">
                     <div class="stat-card">
                         <h3>Total Properties</h3>
-                        <p class="stat-number">12</p>
+                        <p class="stat-number" id="statProperties">0</p>
                     </div>
                     <div class="stat-card">
                         <h3>Occupied Units</h3>
-                        <p class="stat-number">9</p>
+                        <p class="stat-number" id="statOccupied">0</p>
                     </div>
                     <div class="stat-card">
                         <h3>Total Tenants</h3>
-                        <p class="stat-number">9</p>
+                        <p class="stat-number" id="statTenants">0</p>
                     </div>
                     <div class="stat-card">
                         <h3>Monthly Revenue</h3>
-                        <p class="stat-number">₱135,000</p>
+                        <p class="stat-number" id="statRevenue">₱0</p>
                     </div>
                 </div>
 
                 <div class="content-box">
                     <div class="box-header">
                         <h3>Recent Properties Overview</h3>
-                        <button class="add-btn" data-category="Property">+ Add Property</button>
+                        <button class="add-btn" data-key="properties" data-category="Property">+ Add Property</button>
                     </div>
-                    <ul class="data-list">
-                        <li>
-                            <span class="item-info">Unit 101 - Sunset Apartments <em class="status occupied">Occupied</em></span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="item-info">Unit 204 - Grand Heights <em class="status occupied">Occupied</em></span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="item-info">Unit 302 - Palm Residences <em class="status vacant">Vacant</em></span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                    </ul>
+                    <ul class="data-list" id="propertiesList"></ul>
                 </div>
             </div>
 
@@ -212,24 +190,9 @@
                 <div class="content-box">
                     <div class="box-header">
                         <h3>Units Directory</h3>
-                        <button class="add-btn" data-category="Unit">+ Add Unit</button>
+                        <button class="add-btn" data-key="units" data-category="Unit">+ Add Unit</button>
                     </div>
-                    <ul class="data-list">
-                        <li>
-                            <span class="item-info">Unit 101 - 1 Bedroom Apt - ₱15,000/mo</span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="item-info">Unit 204 - 2 Bedroom Apt - ₱22,000/mo</span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                    </ul>
+                    <ul class="data-list" id="unitsList"></ul>
                 </div>
             </div>
 
@@ -238,24 +201,9 @@
                 <div class="content-box">
                     <div class="box-header">
                         <h3>Tenant List</h3>
-                        <button class="add-btn" data-category="Tenant">+ Add Tenant</button>
+                        <button class="add-btn" data-key="tenants" data-category="Tenant">+ Add Tenant</button>
                     </div>
-                    <ul class="data-list">
-                        <li>
-                            <span class="item-info">John Doe (Unit 101) - 0912-345-6789</span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="item-info">Maria Santos (Unit 204) - 0998-765-4321</span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                    </ul>
+                    <ul class="data-list" id="tenantsList"></ul>
                 </div>
             </div>
 
@@ -264,24 +212,9 @@
                 <div class="content-box">
                     <div class="box-header">
                         <h3>Rental Agreements</h3>
-                        <button class="add-btn" data-category="Rental">+ Add Rental</button>
+                        <button class="add-btn" data-key="rentals" data-category="Rental">+ Add Rental</button>
                     </div>
-                    <ul class="data-list">
-                        <li>
-                            <span class="item-info">Lease #001: John Doe (Jan 2026 - Dec 2026)</span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="item-info">Lease #002: Maria Santos (Mar 2026 - Feb 2027)</span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                    </ul>
+                    <ul class="data-list" id="rentalsList"></ul>
                 </div>
             </div>
 
@@ -290,24 +223,9 @@
                 <div class="content-box">
                     <div class="box-header">
                         <h3>Recent Transactions</h3>
-                        <button class="add-btn" data-category="Transaction">+ Add Transaction</button>
+                        <button class="add-btn" data-key="transactions" data-category="Transaction">+ Add Transaction</button>
                     </div>
-                    <ul class="data-list">
-                        <li>
-                            <span class="item-info">TRX-1082: ₱15,000 Paid by John Doe</span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                        <li>
-                            <span class="item-info">TRX-1083: ₱22,000 Paid by Maria Santos</span>
-                            <div class="actions">
-                                <button class="action-btn edit-btn">Edit</button>
-                                <button class="action-btn delete-btn">Delete</button>
-                            </div>
-                        </li>
-                    </ul>
+                    <ul class="data-list" id="transactionsList"></ul>
                 </div>
             </div>
 
@@ -322,6 +240,16 @@
                 <label for="modalInput">Item Details</label>
                 <input type="text" id="modalInput" placeholder="Enter name or details...">
             </div>
+            
+            <!-- Optional Status Dropdown (Shown for Properties/Units) -->
+            <div class="input-group hidden" id="statusGroup">
+                <label for="modalStatus">Status</label>
+                <select id="modalStatus" class="custom-select">
+                    <option value="Occupied">Occupied</option>
+                    <option value="Vacant">Vacant</option>
+                </select>
+            </div>
+
             <div class="modal-actions">
                 <button type="button" id="closeModalBtn" class="modal-cancel-btn">Cancel</button>
                 <button type="button" id="saveModalBtn" class="auth-btn">Save</button>
