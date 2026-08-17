@@ -1,279 +1,461 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Session and Auth Elements
-    const authContainer = document.getElementById("authContainer");
-    const fullDashboard = document.getElementById("fullDashboard");
-    const loginSection = document.getElementById("loginSection");
-    const signupSection = document.getElementById("signupSection");
-    const showSignupBtn = document.getElementById("showSignup");
-    const showLoginBtn = document.getElementById("showLogin");
+// ========================================
+// RENTFLOW LOGIN JAVASCRIPT
+// ========================================
 
-    const loginForm = document.getElementById("loginForm");
-    const signupForm = document.getElementById("signupForm");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const welcomeUser = document.getElementById("welcomeUser");
-    const tabTitle = document.getElementById("tabTitle");
+document.addEventListener("DOMContentLoaded", function () {
 
-    // Modal elements
-    const actionModal = document.getElementById("actionModal");
-    const modalTitle = document.getElementById("modalTitle");
-    const modalInput = document.getElementById("modalInput");
-    const statusGroup = document.getElementById("statusGroup");
-    const modalStatus = document.getElementById("modalStatus");
-    const closeModalBtn = document.getElementById("closeModalBtn");
-    const saveModalBtn = document.getElementById("saveModalBtn");
+    // ========================================
+    // GET HTML ELEMENTS
+    // ========================================
 
-    // Data Storage Structure (Starts empty)
-    let appData = {
-        properties: [],
-        units: [],
-        tenants: [],
-        rentals: [],
-        transactions: []
-    };
+    const form = document.getElementById("loginForm");
 
-    let activeCategoryKey = null;
-    let editIndex = null;
+    const emailField = document.getElementById("emailField");
+    const pwField = document.getElementById("pwField");
 
-    // Load persisted data from LocalStorage
-    const loadSavedData = () => {
-        const storedData = localStorage.getItem("rental_app_data");
-        if (storedData) {
-            try { appData = JSON.parse(storedData); } catch(e) {}
-        }
-        renderAllLists();
-        updateStats();
-    };
+    const emailInput = document.getElementById("email");
+    const pwInput = document.getElementById("password");
 
-    const saveData = () => {
-        localStorage.setItem("rental_app_data", JSON.stringify(appData));
-        renderAllLists();
-        updateStats();
-    };
+    const togglePw = document.getElementById("togglePw");
+    const statusBanner = document.getElementById("statusBanner");
 
-    // Calculate and update top stats automatically
-    const updateStats = () => {
-        document.getElementById("statProperties").textContent = appData.properties.length;
-        document.getElementById("statTenants").textContent = appData.tenants.length;
+    const googleBtn = document.getElementById("googleBtn");
+    const githubBtn = document.getElementById("githubBtn");
 
-        const occupiedCount = appData.properties.filter(p => p.status === "Occupied").length;
-        document.getElementById("statOccupied").textContent = occupiedCount;
 
-        // Try summing transaction amounts if numbers exist
-        let totalRev = 0;
-        appData.transactions.forEach(t => {
-            const num = parseFloat(t.title.replace(/[^0-9.]/g, ''));
-            if (!isNaN(num)) totalRev += num;
+    // ========================================
+    // CHECK LOGIN FORM
+    // ========================================
+
+    if (!form) {
+        console.error("RentFlow: loginForm not found.");
+        return;
+    }
+
+    if (!emailInput || !pwInput) {
+        console.error("RentFlow: email or password input not found.");
+        return;
+    }
+
+
+    // ========================================
+    // ADMIN ACCOUNT
+    // ========================================
+
+    const ADMIN_EMAIL = "admin@rentflow.com";
+    const ADMIN_PASSWORD = "admin123";
+
+
+    // ========================================
+    // SHOW / HIDE PASSWORD
+    // ========================================
+
+    if (togglePw) {
+
+        togglePw.addEventListener("click", function () {
+
+            if (pwInput.type === "password") {
+
+                pwInput.type = "text";
+                togglePw.textContent = "Hide";
+
+            } else {
+
+                pwInput.type = "password";
+                togglePw.textContent = "Show";
+
+            }
+
         });
-        document.getElementById("statRevenue").textContent = `₱${totalRev.toLocaleString()}`;
-    };
 
-    // Render List Items dynamically
-    const renderAllLists = () => {
-        const keys = ['properties', 'units', 'tenants', 'rentals', 'transactions'];
-        keys.forEach(key => {
-            const listEl = document.getElementById(`${key}List`);
-            if (!listEl) return;
+    }
 
-            listEl.innerHTML = '';
-            if (appData[key].length === 0) {
-                listEl.innerHTML = `<li class="empty-state">No items added yet. Click "+ Add" above to start.</li>`;
+
+    // ========================================
+    // EMAIL VALIDATION
+    // ========================================
+
+    function isValidEmail(email) {
+
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    }
+
+
+    // ========================================
+    // SET ERROR
+    // ========================================
+
+    function setError(element, hasError) {
+
+        if (!element) {
+            return;
+        }
+
+        element.classList.toggle("error", hasError);
+
+    }
+
+
+    // ========================================
+    // SHOW MESSAGE
+    // ========================================
+
+    function showMessage(message) {
+
+        if (!statusBanner) {
+            return;
+        }
+
+        statusBanner.textContent = message;
+        statusBanner.classList.add("show");
+
+    }
+
+
+    // ========================================
+    // HIDE MESSAGE
+    // ========================================
+
+    function hideMessage() {
+
+        if (!statusBanner) {
+            return;
+        }
+
+        statusBanner.textContent = "";
+        statusBanner.classList.remove("show");
+
+    }
+
+
+    // ========================================
+    // CLEAR SESSION
+    // ========================================
+
+    function clearSession() {
+
+        localStorage.removeItem("rentflow_user_email");
+        localStorage.removeItem("rentflow_user_role");
+        localStorage.removeItem("rentflow_logged_in");
+
+    }
+
+
+    // ========================================
+    // SAVE SESSION
+    // ========================================
+
+    function saveSession(email, role) {
+
+        localStorage.setItem(
+            "rentflow_user_email",
+            email
+        );
+
+        localStorage.setItem(
+            "rentflow_user_role",
+            role
+        );
+
+        localStorage.setItem(
+            "rentflow_logged_in",
+            "true"
+        );
+
+    }
+
+
+    // ========================================
+    // EMAIL LIVE VALIDATION
+    // ========================================
+
+    emailInput.addEventListener("input", function () {
+
+        const email = emailInput.value.trim();
+
+        if (isValidEmail(email)) {
+
+            setError(
+                emailField,
+                false
+            );
+
+        }
+
+    });
+
+
+    // ========================================
+    // PASSWORD LIVE VALIDATION
+    // ========================================
+
+    pwInput.addEventListener("input", function () {
+
+        if (pwInput.value.length >= 8) {
+
+            setError(
+                pwField,
+                false
+            );
+
+        }
+
+    });
+
+
+    // ========================================
+    // LOGIN
+    // ========================================
+
+    form.addEventListener("submit", function (event) {
+
+        event.preventDefault();
+
+        hideMessage();
+
+
+        // ====================================
+        // GET VALUES
+        // ====================================
+
+        const email = emailInput.value
+            .trim()
+            .toLowerCase();
+
+        const password = pwInput.value;
+
+
+        console.log("================================");
+        console.log("RentFlow Login");
+        console.log("Email:", email);
+        console.log("================================");
+
+
+        // ====================================
+        // VALIDATE EMAIL
+        // ====================================
+
+        if (!isValidEmail(email)) {
+
+            setError(
+                emailField,
+                true
+            );
+
+            showMessage(
+                "Please enter a valid email address."
+            );
+
+            emailInput.focus();
+
+            return;
+
+        }
+
+        setError(
+            emailField,
+            false
+        );
+
+
+        // ====================================
+        // VALIDATE PASSWORD
+        // ====================================
+
+        if (password.length < 8) {
+
+            setError(
+                pwField,
+                true
+            );
+
+            showMessage(
+                "Password must be at least 8 characters."
+            );
+
+            pwInput.focus();
+
+            return;
+
+        }
+
+        setError(
+            pwField,
+            false
+        );
+
+
+        // ====================================
+        // CLEAR OLD SESSION
+        // ====================================
+
+        clearSession();
+
+
+        // ====================================
+        // ADMIN LOGIN
+        // ====================================
+
+        if (email === ADMIN_EMAIL) {
+
+            console.log("Admin email detected.");
+
+            // Check admin password
+
+            if (password !== ADMIN_PASSWORD) {
+
+                console.error(
+                    "Incorrect admin password."
+                );
+
+                setError(
+                    pwField,
+                    true
+                );
+
+                showMessage(
+                    "Incorrect admin password. Use admin123 for the demo admin account."
+                );
+
+                pwInput.focus();
+
                 return;
+
             }
 
-            appData[key].forEach((item, index) => {
-                const li = document.createElement("li");
-                
-                const statusBadge = item.status 
-                    ? `<em class="status ${item.status.toLowerCase()}">${item.status}</em>` 
-                    : '';
 
-                li.innerHTML = `
-                    <span class="item-info">${item.title} ${statusBadge}</span>
-                    <div class="actions">
-                        <button class="action-btn edit-btn" data-key="${key}" data-index="${index}">Edit</button>
-                        <button class="action-btn delete-btn" data-key="${key}" data-index="${index}">Delete</button>
-                    </div>
-                `;
-                listEl.appendChild(li);
-            });
-        });
-    };
+            // =================================
+            // ADMIN AUTHENTICATED
+            // =================================
 
-    // Check Session on Reload
-    const checkSavedSession = () => {
-        const savedUser = localStorage.getItem("rental_user");
-        if (savedUser) {
-            openDashboard(savedUser);
-        }
-    };
+            saveSession(
+                ADMIN_EMAIL,
+                "admin"
+            );
 
-    const toggleForm = (hideSection, showSection) => {
-        hideSection.classList.add("hidden");
-        showSection.classList.remove("hidden");
-    };
+            console.log(
+                "ADMIN LOGIN SUCCESS"
+            );
 
-    showSignupBtn.addEventListener("click", () => toggleForm(loginSection, signupSection));
-    showLoginBtn.addEventListener("click", () => toggleForm(signupSection, loginSection));
+            console.log(
+                "Redirecting to admindashboard.html"
+            );
 
-    // Password Toggle
-    document.querySelectorAll(".toggle-password").forEach(toggle => {
-        toggle.addEventListener("click", () => {
-            const targetId = toggle.getAttribute("data-target");
-            const input = document.getElementById(targetId);
-            input.type = input.type === "password" ? "text" : "password";
-            toggle.textContent = input.type === "password" ? "Show" : "Hide";
-        });
-    });
 
-    const openDashboard = (userName) => {
-        localStorage.setItem("rental_user", userName);
-        authContainer.classList.add("hidden");
-        fullDashboard.classList.remove("hidden");
-        document.body.classList.remove("login-mode");
-        document.body.classList.add("dashboard-mode");
-        welcomeUser.textContent = `Welcome back, ${userName}!`;
-        loadSavedData();
-    };
+            showMessage(
+                "Admin login successful. Opening admin dashboard..."
+            );
 
-    // Form Submissions with validation
-    loginForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (!loginForm.checkValidity()) {
-            loginForm.reportValidity();
+
+            // Give browser time to display message
+
+            setTimeout(function () {
+
+                window.location.assign(
+                    "admindashboard.html"
+                );
+
+            }, 500);
+
+
             return;
+
         }
-        const email = document.getElementById("loginEmail").value.trim();
-        openDashboard(email.split('@')[0]);
-        loginForm.reset();
+
+
+        // ====================================
+        // CLIENT LOGIN
+        // ====================================
+
+        console.log(
+            "Client login detected."
+        );
+
+
+        saveSession(
+            email,
+            "client"
+        );
+
+
+        console.log(
+            "CLIENT LOGIN SUCCESS"
+        );
+
+        console.log(
+            "Client email:",
+            email
+        );
+
+
+        showMessage(
+            "Login successful. Opening your dashboard..."
+        );
+
+
+        setTimeout(function () {
+
+            window.location.assign(
+                "dashboard.html"
+            );
+
+        }, 500);
+
     });
 
-    signupForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        if (!signupForm.checkValidity()) {
-            signupForm.reportValidity();
-            return;
-        }
-        const name = document.getElementById("signupName").value.trim();
-        openDashboard(name);
-        signupForm.reset();
-    });
 
-    // Logout
-    logoutBtn.addEventListener("click", () => {
-        localStorage.removeItem("rental_user");
-        fullDashboard.classList.add("hidden");
-        authContainer.classList.remove("hidden");
-        document.body.classList.remove("dashboard-mode");
-        document.body.classList.add("login-mode");
-    });
+    // ========================================
+    // GOOGLE LOGIN
+    // ========================================
 
-    // Sidebar Navigation
-    const navButtons = document.querySelectorAll(".nav-btn");
-    const tabContents = document.querySelectorAll(".tab-content");
+    if (googleBtn) {
 
-    navButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            const selectedTab = button.getAttribute("data-tab");
+        googleBtn.addEventListener(
+            "click",
+            function () {
 
-            navButtons.forEach(btn => btn.classList.remove("active"));
-            button.classList.add("active");
+                showMessage(
+                    "Google sign-in is not connected yet."
+                );
 
-            tabContents.forEach(content => {
-                if (content.id === `${selectedTab}Tab`) {
-                    content.classList.remove("hidden");
-                } else {
-                    content.classList.add("hidden");
-                }
-            });
-
-            const titles = {
-                dashboard: "Overview Dashboard",
-                units: "Units Management",
-                tenants: "Tenants Management",
-                rentals: "Rental Agreements",
-                transactions: "Transaction Records"
-            };
-            tabTitle.textContent = titles[selectedTab] || "Dashboard";
-        });
-    });
-
-    // --- ADD / EDIT / DELETE LISTENERS --- //
-
-    document.addEventListener("click", (e) => {
-        // Delete Action
-        if (e.target.classList.contains("delete-btn")) {
-            const key = e.target.getAttribute("data-key");
-            const idx = parseInt(e.target.getAttribute("data-index"));
-
-            if (confirm("Are you sure you want to delete this item?")) {
-                appData[key].splice(idx, 1);
-                saveData();
             }
-        }
+        );
 
-        // Edit Action
-        if (e.target.classList.contains("edit-btn")) {
-            activeCategoryKey = e.target.getAttribute("data-key");
-            editIndex = parseInt(e.target.getAttribute("data-index"));
+    }
 
-            const item = appData[activeCategoryKey][editIndex];
-            modalTitle.textContent = "Edit Item";
-            modalInput.value = item.title;
 
-            if (activeCategoryKey === "properties") {
-                statusGroup.classList.remove("hidden");
-                modalStatus.value = item.status || "Occupied";
-            } else {
-                statusGroup.classList.add("hidden");
+    // ========================================
+    // GITHUB LOGIN
+    // ========================================
+
+    if (githubBtn) {
+
+        githubBtn.addEventListener(
+            "click",
+            function () {
+
+                showMessage(
+                    "GitHub sign-in is not connected yet."
+                );
+
             }
+        );
 
-            actionModal.classList.remove("hidden");
-        }
+    }
 
-        // Add Action
-        if (e.target.classList.contains("add-btn")) {
-            activeCategoryKey = e.target.getAttribute("data-key");
-            const categoryName = e.target.getAttribute("data-category");
 
-            editIndex = null;
-            modalTitle.textContent = `Add New ${categoryName}`;
-            modalInput.value = "";
+    // ========================================
+    // DEBUG INFORMATION
+    // ========================================
 
-            if (activeCategoryKey === "properties") {
-                statusGroup.classList.remove("hidden");
-            } else {
-                statusGroup.classList.add("hidden");
-            }
+    console.log(
+        "RentFlow login JavaScript loaded."
+    );
 
-            actionModal.classList.remove("hidden");
-        }
-    });
+    console.log(
+        "Admin email:",
+        ADMIN_EMAIL
+    );
 
-    closeModalBtn.addEventListener("click", () => {
-        actionModal.classList.add("hidden");
-    });
-
-    saveModalBtn.addEventListener("click", () => {
-        const titleVal = modalInput.value.trim();
-        if (!titleVal) return;
-
-        const newItemObj = { title: titleVal };
-        if (activeCategoryKey === "properties") {
-            newItemObj.status = modalStatus.value;
-        }
-
-        if (editIndex !== null) {
-            // Edit existing
-            appData[activeCategoryKey][editIndex] = newItemObj;
-        } else {
-            // Add new
-            appData[activeCategoryKey].push(newItemObj);
-        }
-
-        saveData();
-        actionModal.classList.add("hidden");
-    });
-
-    // Initial session check on page load
-    checkSavedSession();
 });

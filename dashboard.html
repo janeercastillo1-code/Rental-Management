@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentFlow Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+        :root {
+            --bg: #0b0e1b;
+            --panel: #15192b;
+            --line: rgba(255, 255, 255, .1);
+            --text: #f4f3fa;
+            --muted: rgba(244, 243, 250, .58);
+            --v: #7c6cf6;
+            --v2: #ad9dff;
+            --c: #5ee7d9;
+            --danger: #ff707d;
+            --warn: #ffc76b;
+            --body: 'Manrope', sans-serif;
+            --display: 'Space Grotesk', sans-serif
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            margin: 0;
+            min-height: 100%;
+            font-family: var(--body);
+            color: var(--text);
+            background: radial-gradient(circle at 5% 0%, rgba(124, 108, 246, .22), transparent 28%), radial-gradient(circle at 95% 90%, rgba(94, 231, 217, .12), transparent 25%), var(--bg)
+        }
+
+        button,
+        input,
+        select {
+            font: inherit
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex
+        }
+
+        .side {
+            position: fixed;
+            inset: 0 auto 0 0;
+            width: 255px;
+            padding: 24px 16px;
+            background: rgba(14, 17, 32, .9);
+            border-right: 1px solid var(--line);
+            backdrop-filter: blur(20px);
+            z-index: 10
+        }
+
+        .brand {
+            display: flex;
+            gap: 11px;
+            align-items: center;
+            padding: 4px 10px 28px
+        }
+
+        .logo {
+            width: 42px;
+            height: 42px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, var(--v), var(--c));
+            box-shadow: 0 12px 30px rgba(124, 108, 246, .3)
+        }
+
+        .logo svg {
+            width: 21px
+        }
+
+        .brand b {
+            font: 700 17px var(--display)
+        }
+
+        .brand small {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 2px
+        }
+
+        .label {
+            padding: 0 12px 9px;
+            color: rgba(244, 243, 250, .35);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase
+        }
+
+        .nav {
+            display: grid;
+            gap: 6px
+        }
+
+        .nav button {
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            width: 100%;
+            padding: 11px 12px;
+            border-radius: 12px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 11px
+        }
+
+        .nav button:hover,
+        .nav button.active {
+            background: rgba(124, 108, 246, .13);
+            color: var(--text)
+        }
+
+        .nav button.active {
+            box-shadow: inset 3px 0 var(--v)
+        }
+
+        .nav svg {
+            width: 18px;
+            height: 18px
+        }
+
+        .bottom {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 22px
+        }
+
+        .user {
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .035);
+            border-radius: 14px;
+            padding: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #6556e8, #45cfc3);
+            font-size: 12px;
+            font-weight: 800
+        }
+
+        .user b {
+            display: block;
+            font-size: 12px
+        }
+
+        .user span {
+            font-size: 10px;
+            color: var(--muted);
+            word-break: break-all
+        }
+
+        .logout {
+            width: 100%;
+            margin-top: 8px;
+            padding: 9px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--muted)
+        }
+
+        .logout:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, .05)
+        }
+
+        .main {
+            margin-left: 255px;
+            width: calc(100% - 255px);
+            padding: 30px;
+            max-width: 1600px
+        }
+
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 28px
+        }
+
+        .eyebrow {
+            font-size: 11px;
+            color: var(--c);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .12em
+        }
+
+        .top h1 {
+            font: 700 30px var(--display);
+            margin: 5px 0;
+            letter-spacing: -.03em
+        }
+
+        .top p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .chip {
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .035);
+            border-radius: 11px;
+            padding: 10px 12px;
+            color: var(--muted);
+            font-size: 11px
+        }
+
+        .primary {
+            border: 0;
+            border-radius: 11px;
+            padding: 11px 15px;
+            color: #fff;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--v), #6658dc);
+            box-shadow: 0 12px 24px rgba(124, 108, 246, .22)
+        }
+
+        .primary:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px)
+        }
+
+        .secondary {
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .04);
+            color: var(--muted);
+            border-radius: 10px;
+            padding: 10px 13px
+        }
+
+        .secondary:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, .08)
+        }
+
+        .notice {
+            display: none;
+            margin-bottom: 18px;
+            padding: 12px 15px;
+            border-radius: 13px;
+            border: 1px solid rgba(94, 231, 217, .3);
+            background: rgba(94, 231, 217, .08);
+            font-size: 12px
+        }
+
+        .notice.show {
+            display: block
+        }
+
+        .notice b {
+            color: var(--c)
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 20px
+        }
+
+        .stat {
+            background: rgba(255, 255, 255, .045);
+            border: 1px solid var(--line);
+            border-radius: 17px;
+            padding: 18px
+        }
+
+        .stat small {
+            color: var(--muted);
+            font-size: 11px
+        }
+
+        .stat strong {
+            display: block;
+            font: 700 27px var(--display);
+            margin: 12px 0 3px
+        }
+
+        .stat span {
+            font-size: 10px;
+            color: var(--muted)
+        }
+
+        .card {
+            background: rgba(255, 255, 255, .045);
+            border: 1px solid var(--line);
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .22)
+        }
+
+        .head {
+            padding: 19px 20px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px
+        }
+
+        .head h2 {
+            font: 700 18px var(--display);
+            margin: 0
+        }
+
+        .head p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 11px
+        }
+
+        .search input {
+            width: 220px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .04);
+            color: #fff;
+            outline: 0;
+            font-size: 12px
+        }
+
+        .search input:focus {
+            border-color: var(--v2);
+            box-shadow: 0 0 0 3px rgba(124, 108, 246, .13)
+        }
+
+        .page {
+            display: none
+        }
+
+        .page.active {
+            display: block
+        }
+
+        .grid2 {
+            display: grid;
+            grid-template-columns: 1.4fr .8fr;
+            gap: 18px
+        }
+
+        .table-wrap {
+            overflow: auto
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 760px
+        }
+
+        .table th,
+        .table td {
+            padding: 13px 17px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+            font-size: 12px;
+            white-space: nowrap
+        }
+
+        .table th {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: rgba(244, 243, 250, .4);
+            background: rgba(255, 255, 255, .018)
+        }
+
+        .table td {
+            color: rgba(244, 243, 250, .84)
+        }
+
+        .table tr:hover td {
+            background: rgba(255, 255, 255, .02)
+        }
+
+        .badge {
+            display: inline-flex;
+            padding: 5px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            background: rgba(94, 231, 217, .1);
+            color: var(--c)
+        }
+
+        .badge.v {
+            background: rgba(124, 108, 246, .13);
+            color: var(--v2)
+        }
+
+        .badge.w {
+            background: rgba(255, 199, 107, .11);
+            color: var(--warn)
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px
+        }
+
+        .icon,
+        .icon-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--line);
+            background: rgba(255, 255, 255, .035);
+            color: var(--muted);
+            border-radius: 8px;
+            display: grid;
+            place-items: center
+        }
+
+        .icon:hover,
+        .icon-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, .08)
+        }
+
+        .icon.del:hover,
+        .icon-btn.delete:hover {
+            color: var(--danger)
+        }
+
+        .empty {
+            text-align: center;
+            padding: 45px 20px;
+            color: var(--muted);
+            font-size: 13px
+        }
+
+        .quick {
+            padding: 7px 18px 15px
+        }
+
+        .qitem {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .06)
+        }
+
+        .qitem:last-child {
+            border: 0
+        }
+
+        .qleft {
+            display: flex;
+            gap: 10px;
+            align-items: center
+        }
+
+        .mini {
+            width: 35px;
+            height: 35px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: rgba(124, 108, 246, .12);
+            color: var(--v2)
+        }
+
+        .qleft b {
+            display: block;
+            font-size: 12px
+        }
+
+        .qleft span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 3px
+        }
+
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 5, 13, .72);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 50
+        }
+
+        .overlay.show {
+            display: flex
+        }
+
+        .modal {
+            width: min(650px, 100%);
+            max-height: 90vh;
+            overflow: auto;
+            background: #171b2d;
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            box-shadow: 0 35px 100px rgba(0, 0, 0, .5)
+        }
+
+        .mh {
+            padding: 20px 22px;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .mh h3 {
+            font: 700 18px var(--display);
+            margin: 0
+        }
+
+        .close {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            border: 1px solid var(--line);
+            background: transparent;
+            color: var(--muted);
+            font-size: 18px
+        }
+
+        .form {
+            padding: 20px 22px
+        }
+
+        .fg {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px
+        }
+
+        .field.full {
+            grid-column: 1/-1
+        }
+
+        .field label {
+            display: block;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 7px
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, .045);
+            color: #fff;
+            outline: 0;
+            font-size: 12px
+        }
+
+        .field select option {
+            background: #171b2d
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--v2);
+            box-shadow: 0 0 0 3px rgba(124, 108, 246, .12)
+        }
+
+        .fa {
+            display: flex;
+            justify-content: flex-end;
+            gap: 9px;
+            margin-top: 20px
+        }
+
+        .toast {
+            position: fixed;
+            right: 24px;
+            bottom: 24px;
+            background: #1a2034;
+            border: 1px solid rgba(94, 231, 217, .3);
+            padding: 12px 15px;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
+            font-size: 12px;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: .25s;
+            pointer-events: none;
+            z-index: 100
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: none
+        }
+
+        .toast b {
+            color: var(--c)
+        }
+
+        @media(max-width:1100px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .grid2 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:780px) {
+            .side {
+                width: 72px;
+                padding: 18px 10px
+            }
+
+            .brand {
+                justify-content: center;
+                padding: 2px 0 24px
+            }
+
+            .brand>div:last-child,
+            .label,
+            .nav button span,
+            .user>div:not(.avatar),
+            .logout {
+                display: none
+            }
+
+            .nav button {
+                justify-content: center
+            }
+
+            .bottom {
+                left: 10px;
+                right: 10px
+            }
+
+            .user {
+                justify-content: center
+            }
+
+            .main {
+                margin-left: 72px;
+                width: calc(100% - 72px);
+                padding: 20px
+            }
+
+            .chip {
+                display: none
+            }
+        }
+
+        @media(max-width:560px) {
+            .stats {
+                grid-template-columns: 1fr
+            }
+
+            .top {
+                align-items: flex-start
+            }
+
+            .top h1 {
+                font-size: 24px
+            }
+
+            .top-actions .primary {
+                padding: 10px 12px
+            }
+
+            .head {
+                align-items: flex-start;
+                flex-direction: column
+            }
+
+            .search,
+            .search input {
+                width: 100%
+            }
+
+            .fg {
+                grid-template-columns: 1fr
+            }
+
+            .field.full {
+                grid-column: auto
+            }
+
+            .main {
+                padding: 14px
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <aside class="side">
+            <div class="brand">
+                <div class="logo"><svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white" />
+                    </svg></div>
+                <div><b>RentFlow</b><small>Property Manager</small></div>
+            </div>
+            <div class="label">Workspace</div>
+            <nav class="nav">
+                <button class="active" data-page="dashboard"><span>▦</span><span>Dashboard</span></button>
+                <button data-page="units"><span>⌂</span><span>Units</span></button>
+                <button data-page="tenants"><span>◉</span><span>Tenants</span></button>
+                <button data-page="rentals"><span>↗</span><span>Rentals</span></button>
+                <button data-page="transactions"><span>₱</span><span>Transactions</span></button>
+            </nav>
+            <div class="bottom">
+                <div class="user">
+                    <div class="avatar" id="avatar">U</div>
+                    <div><b id="userName">User</b><span id="userEmail">user@example.com</span></div>
+                </div><button class="logout" id="logoutBtn">Sign out</button>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="top">
+                <div>
+                    <div class="eyebrow" id="roleLabel">Client workspace</div>
+                    <h1 id="pageTitle">Dashboard overview</h1>
+                    <p id="pageSubtitle">Your rental information in one secure workspace.</p>
+                </div>
+                <div class="top-actions">
+                    <div class="chip" id="today"></div><button class="primary" id="globalAdd">+ Add record</button>
+                </div>
+            </header>
+            <div class="notice" id="scopeNotice"></div>
+
+            <section class="page active" id="page-dashboard">
+                <div class="stats">
+                    <div class="stat"><small>Visible Units</small><strong id="statUnits">0</strong><span
+                            id="sUnitsNote">Your units</span></div>
+                    <div class="stat"><small>Visible Tenants</small><strong id="statTenants">0</strong><span
+                            id="sTenantsNote">Your tenants</span></div>
+                    <div class="stat"><small>Visible Rentals</small><strong id="statRentals">0</strong><span
+                            id="sRentalsNote">Your rentals</span></div>
+                    <div class="stat"><small>Current Balance</small><strong id="statBalance">₱0.00</strong><span
+                            id="sBalanceNote">Your transactions</span></div>
+                </div>
+                <div class="grid2">
+                    <div class="card">
+                        <div class="head">
+                            <div>
+                                <h2>Recent rentals</h2>
+                                <p>Only records available to this account</p>
+                            </div><button class="secondary" onclick="showPage('rentals')">View all</button>
+                        </div>
+                        <div class="table-wrap">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Rental ID</th>
+                                        <th>Unit</th>
+                                        <th>Tenant</th>
+                                        <th>Start</th>
+                                        <th>End</th>
+                                        <th>Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentRentals"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="head">
+                            <div>
+                                <h2>Access summary</h2>
+                                <p>Current account scope</p>
+                            </div>
+                        </div>
+                        <div class="quick" id="quickSummary"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="page-units">
+                <div class="card">
+                    <div class="head">
+                        <div>
+                            <h2>Units</h2>
+                            <p id="unitsDesc"></p>
+                        </div>
+                        <div class="top-actions">
+                            <div class="search"><input id="search-units" placeholder="Search units..."></div><button
+                                class="primary" onclick="openModal('units')">+ Add unit</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Unit Id</th>
+                                    <th>Room number</th>
+                                    <th>Type of Room</th>
+                                    <th>Unit Price</th>
+                                    <th>Owner account</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-units"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <section class="page" id="page-tenants">
+                <div class="card">
+                    <div class="head">
+                        <div>
+                            <h2>Tenants</h2>
+                            <p id="tenantsDesc"></p>
+                        </div>
+                        <div class="top-actions">
+                            <div class="search"><input id="search-tenants" placeholder="Search tenants..."></div><button
+                                class="primary" onclick="openModal('tenants')">+ Add tenant</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Tenant id</th>
+                                    <th>Full Name</th>
+                                    <th>Contact number</th>
+                                    <th>Works</th>
+                                    <th>Pets</th>
+                                    <th>Owner account</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-tenants"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <section class="page" id="page-rentals">
+                <div class="card">
+                    <div class="head">
+                        <div>
+                            <h2>Rentals</h2>
+                            <p id="rentalsDesc"></p>
+                        </div>
+                        <div class="top-actions">
+                            <div class="search"><input id="search-rentals" placeholder="Search rentals..."></div><button
+                                class="primary" onclick="openModal('rentals')">+ Add rental</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Rental ID</th>
+                                    <th>Unit Id</th>
+                                    <th>Tenant Id</th>
+                                    <th>Start</th>
+                                    <th>End</th>
+                                    <th>Unit Price</th>
+                                    <th>Owner account</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-rentals"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <section class="page" id="page-transactions">
+                <div class="card">
+                    <div class="head">
+                        <div>
+                            <h2>Transactions</h2>
+                            <p id="transactionsDesc"></p>
+                        </div>
+                        <div class="top-actions">
+                            <div class="search"><input id="search-transactions" placeholder="Search transactions...">
+                            </div><button class="primary" onclick="openModal('transactions')">+ Add transaction</button>
+                        </div>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Transaction Id</th>
+                                    <th>Rental Id</th>
+                                    <th>Price</th>
+                                    <th>Current balance</th>
+                                    <th>Owner account</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-transactions"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="mh">
+                <h3 id="modalTitle">Add record</h3><button class="close" onclick="closeModal()">×</button>
+            </div>
+            <form class="form" id="recordForm">
+                <div class="fg" id="formFields"></div>
+                <div class="fa"><button type="button" class="secondary" onclick="closeModal()">Cancel</button><button
+                        class="primary">Save record</button></div>
+            </form>
+        </div>
+    </div>
+    <div class="toast" id="toast">✓ <b id="toastText">Saved</b></div>
+
+    <script>
+        const ADMIN_EMAIL = 'admin@rentflow.com';
+        const DB_KEY = 'rentflow_records_v1';
+        const defaultDB = { units: [], tenants: [], rentals: [], transactions: [] };
+
+        // ===============================
+        // LOGIN / ROLE PROTECTION
+        // ===============================
+        const loggedInEmail = (localStorage.getItem('rentflow_user_email') || '').trim().toLowerCase();
+        let loggedInRole = localStorage.getItem('rentflow_user_role');
+        const loggedIn = localStorage.getItem('rentflow_logged_in') === 'true';
+
+        if (!loggedIn || !loggedInEmail) {
+            window.location.href = 'Login.html';
+            throw new Error('Not authenticated');
+        }
+
+        // Admin accounts must use admindashboard.html.
+        if (loggedInEmail === ADMIN_EMAIL || loggedInRole === 'admin') {
+            localStorage.setItem('rentflow_user_role', 'admin');
+            window.location.href = 'admindashboard.html';
+            throw new Error('Admin redirected');
+        }
+
+        // Old sessions may not have a role yet.
+        if (loggedInRole !== 'client') {
+            loggedInRole = 'client';
+            localStorage.setItem('rentflow_user_role', 'client');
+        }
+
+        let db = loadDB();
+        let currentType = '';
+        let editingIndex = null;
+
+        // ===============================
+        // DATABASE
+        // ===============================
+        function loadDB() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(DB_KEY) || '{}');
+                return {
+                    ...defaultDB,
+                    ...saved,
+                    units: Array.isArray(saved.units) ? saved.units : [],
+                    tenants: Array.isArray(saved.tenants) ? saved.tenants : [],
+                    rentals: Array.isArray(saved.rentals) ? saved.rentals : [],
+                    transactions: Array.isArray(saved.transactions) ? saved.transactions : []
+                };
+            } catch (e) {
+                return { units: [], tenants: [], rentals: [], transactions: [] };
+            }
+        }
+
+        // Existing records from the old version have no ownerEmail.
+        // If every existing record is legacy data, assign it to the first
+        // client who logs in so your current sample data remains visible.
+        function migrateLegacyData() {
+            const all = [...db.units, ...db.tenants, ...db.rentals, ...db.transactions];
+            if (!all.length) return;
+
+            const hasOwner = all.some(r => String(r.ownerEmail || '').trim() !== '');
+            if (hasOwner) return;
+
+            all.forEach(r => r.ownerEmail = loggedInEmail);
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+        }
+
+        migrateLegacyData();
+
+        function saveDB() {
+            localStorage.setItem(DB_KEY, JSON.stringify(db));
+            renderAll();
+        }
+
+        // ===============================
+        // CLIENT DATA FILTER
+        // ===============================
+        function isMine(record) {
+            return String(record.ownerEmail || '').trim().toLowerCase() === loggedInEmail;
+        }
+
+        function getMyRecords(type) {
+            return db[type]
+                .map((record, index) => ({ record, index }))
+                .filter(item => isMine(item.record));
+        }
+
+        function getMyRecord(type, index) {
+            const record = db[type][index];
+            return record && isMine(record) ? record : null;
+        }
+
+        function money(v) {
+            return '₱' + Number(v || 0).toLocaleString('en-PH', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+        }
+
+        function esc(v) {
+            return String(v ?? '').replace(/[&<>"']/g, m => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+            }[m]));
+        }
+
+        function iconEdit() {
+            return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>';
+        }
+
+        function iconDelete() {
+            return '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M9 6V4h6v2M19 6l-1 15H6L5 6M10 11v6M14 11v6"/></svg>';
+        }
+
+        function actionBtns(type, i) {
+            return `<div class="actions"><button class="icon-btn" title="Edit" onclick="openModal('${type}',${i})">${iconEdit()}</button><button class="icon-btn delete" title="Delete" onclick="deleteRecord('${type}',${i})">${iconDelete()}</button></div>`;
+        }
+
+        // ===============================
+        // FORM CONFIGURATION
+        // ===============================
+        const configs = {
+            units: {
+                title: 'Add unit',
+                fields: [
+                    ['unitId', 'Unit Id', 'text', 'e.g. U-001'],
+                    ['roomNumber', 'Room number', 'text', 'e.g. 101'],
+                    ['roomType', 'Type of Room', 'text', 'e.g. Studio'],
+                    ['unitPrice', 'Unit Price', 'number', '0']
+                ]
+            },
+            tenants: {
+                title: 'Add tenant',
+                fields: [
+                    ['tenantId', 'Tenant id', 'text', 'e.g. T-001'],
+                    ['fullName', 'Full Name', 'text', 'e.g. Juan Dela Cruz'],
+                    ['contact', 'Contact number', 'tel', 'e.g. 09XXXXXXXXX'],
+                    ['works', 'Works', 'text', 'e.g. Software Developer'],
+                    ['pets', 'Pets', 'text', 'e.g. None / 1 dog']
+                ]
+            },
+            rentals: {
+                title: 'Add rental',
+                fields: [
+                    ['rentalId', 'Rental ID', 'text', 'e.g. R-001'],
+                    ['unitId', 'Unit Id', 'selectUnit', ''],
+                    ['tenantId', 'Tenant Id', 'selectTenant', ''],
+                    ['startDate', 'Start_date', 'date', ''],
+                    ['endDate', 'End_date', 'date', ''],
+                    ['unitPrice', 'Unit Price', 'number', '0']
+                ]
+            },
+            transactions: {
+                title: 'Add transaction',
+                fields: [
+                    ['transactionId', 'Transaction Id', 'text', 'e.g. TR-001'],
+                    ['rentalId', 'Rental Id', 'selectRental', ''],
+                    ['price', 'Price', 'number', '0'],
+                    ['balance', 'Current balance', 'number', '0']
+                ]
+            }
+        };
+
+        // ===============================
+        // RENDER TABLES - ONLY THIS CLIENT
+        // ===============================
+        function renderTable(type, query = '') {
+            const q = String(query || '').toLowerCase();
+            const rows = getMyRecords(type).filter(({ record }) =>
+                JSON.stringify(record).toLowerCase().includes(q)
+            );
+            const el = document.getElementById('table-' + type);
+            if (!el) return;
+
+            if (!rows.length) {
+                el.innerHTML = '<tr><td colspan="10" class="empty">No records found.</td></tr>';
+                return;
+            }
+
+            el.innerHTML = rows.map(({ record: r, index: i }) => {
+                if (type === 'units') return `<tr><td><b>${esc(r.unitId)}</b></td><td>${esc(r.roomNumber)}</td><td><span class="badge violet">${esc(r.roomType)}</span></td><td>${money(r.unitPrice)}</td><td>${actionBtns(type, i)}</td></tr>`;
+                if (type === 'tenants') return `<tr><td><b>${esc(r.tenantId)}</b></td><td>${esc(r.fullName)}</td><td>${esc(r.contact)}</td><td>${esc(r.works)}</td><td>${esc(r.pets)}</td><td>${actionBtns(type, i)}</td></tr>`;
+                if (type === 'rentals') return `<tr><td><b>${esc(r.rentalId)}</b></td><td>${esc(r.unitId)}</td><td>${esc(r.tenantId)}</td><td>${esc(r.startDate)}</td><td>${esc(r.endDate)}</td><td>${money(r.unitPrice)}</td><td>${actionBtns(type, i)}</td></tr>`;
+                return `<tr><td><b>${esc(r.transactionId)}</b></td><td>${esc(r.rentalId)}</td><td>${money(r.price)}</td><td>${money(r.balance)}</td><td><span class="badge ${Number(r.balance) > 0 ? 'warn' : ''}">${Number(r.balance) > 0 ? 'Balance due' : 'Paid'}</span></td><td>${actionBtns(type, i)}</td></tr>`;
+            }).join('');
+        }
+
+        // ===============================
+        // DASHBOARD STATS - ONLY THIS CLIENT
+        // ===============================
+        function renderDashboard() {
+            const units = getMyRecords('units').map(x => x.record);
+            const tenants = getMyRecords('tenants').map(x => x.record);
+            const rentals = getMyRecords('rentals').map(x => x.record);
+            const transactions = getMyRecords('transactions').map(x => x.record);
+
+            document.getElementById('statUnits').textContent = units.length;
+            document.getElementById('statTenants').textContent = tenants.length;
+            document.getElementById('statRentals').textContent = rentals.length;
+            document.getElementById('statBalance').textContent = money(
+                transactions.reduce((sum, r) => sum + Number(r.balance || 0), 0)
+            );
+
+            const recent = rentals.slice(-5).reverse();
+            document.getElementById('recentRentals').innerHTML = recent.length
+                ? recent.map(r => `<tr><td><b>${esc(r.rentalId)}</b></td><td>${esc(r.unitId)}</td><td>${esc(r.tenantId)}</td><td>${esc(r.startDate)}</td><td>${esc(r.endDate)}</td><td>${money(r.unitPrice)}</td></tr>`).join('')
+                : '<tr><td colspan="6" class="empty">No rentals yet.</td></tr>';
+
+            document.getElementById('quickSummary').innerHTML = [
+                ['Units available', units.length, '⌂'],
+                ['Registered tenants', tenants.length, '◉'],
+                ['Rental contracts', rentals.length, '↗'],
+                ['Transactions', transactions.length, '₱']
+            ].map(x => `<div class="quick-item"><div class="quick-main"><div class="mini-icon">${x[2]}</div><div><strong>${x[1]}</strong><span>${x[0]}</span></div></div><span class="badge">${x[1] ? 'Active' : 'Empty'}</span></div>`).join('');
+        }
+
+        function renderAll() {
+            renderDashboard();
+            ['units', 'tenants', 'rentals', 'transactions'].forEach(type =>
+                renderTable(type, document.getElementById('search-' + type)?.value || '')
+            );
+        }
+
+        // ===============================
+        // NAVIGATION
+        // ===============================
+        function showPage(type) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + type).classList.add('active');
+            document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.page === type));
+
+            const titles = {
+                dashboard: ['Dashboard overview', 'Manage your units, tenants, rentals, and payments.'],
+                units: ['Units', 'Manage your rooms and pricing.'],
+                tenants: ['Tenants', 'Keep your tenant information organized.'],
+                rentals: ['Rentals', 'Manage your rental agreements and dates.'],
+                transactions: ['Transactions', 'Track your payments and balances.']
+            };
+            document.getElementById('pageTitle').textContent = titles[type][0];
+            document.getElementById('pageSubtitle').textContent = titles[type][1];
+        }
+
+        // ===============================
+        // MODAL
+        // ===============================
+        function openModal(type, index = null) {
+            currentType = type;
+            editingIndex = index;
+
+            if (index !== null && !getMyRecord(type, index)) {
+                toast('You cannot edit this record.');
+                return;
+            }
+
+            const c = configs[type];
+            document.getElementById('modalTitle').textContent = index === null ? c.title : 'Edit ' + type.slice(0, -1);
+
+            document.getElementById('formFields').innerHTML = c.fields.map(([key, label, kind, placeholder]) => {
+                if (kind === 'selectUnit') {
+                    const units = getMyRecords('units').map(x => x.record);
+                    return `<div class="form-field"><label>${label}</label><select name="${key}" required><option value="">Select unit</option>${units.map(u => `<option value="${esc(u.unitId)}">${esc(u.unitId)} — Room ${esc(u.roomNumber)}</option>`).join('')}</select></div>`;
+                }
+                if (kind === 'selectTenant') {
+                    const tenants = getMyRecords('tenants').map(x => x.record);
+                    return `<div class="form-field"><label>${label}</label><select name="${key}" required><option value="">Select tenant</option>${tenants.map(t => `<option value="${esc(t.tenantId)}">${esc(t.tenantId)} — ${esc(t.fullName)}</option>`).join('')}</select></div>`;
+                }
+                if (kind === 'selectRental') {
+                    const rentals = getMyRecords('rentals').map(x => x.record);
+                    return `<div class="form-field"><label>${label}</label><select name="${key}" required><option value="">Select rental</option>${rentals.map(r => `<option value="${esc(r.rentalId)}">${esc(r.rentalId)} — ${esc(r.unitId)}</option>`).join('')}</select></div>`;
+                }
+                return `<div class="form-field"><label>${label}</label><input name="${key}" type="${kind}" placeholder="${placeholder}" step="${kind === 'number' ? '0.01' : ''}" required></div>`;
+            }).join('');
+
+            if (index !== null) {
+                Object.entries(db[type][index]).forEach(([key, value]) => {
+                    const el = document.querySelector(`[name="${key}"]`);
+                    if (el) el.value = value;
+                });
+            }
+
+            if (type === 'rentals') {
+                const unitSelect = document.querySelector('[name="unitId"]');
+                const price = document.querySelector('[name="unitPrice"]');
+                unitSelect?.addEventListener('change', () => {
+                    const unit = getMyRecords('units').map(x => x.record).find(x => x.unitId === unitSelect.value);
+                    if (unit && price) price.value = unit.unitPrice;
+                });
+            }
+
+            document.getElementById('modalOverlay').classList.add('show');
+            setTimeout(() => document.querySelector('#formFields input, #formFields select')?.focus(), 50);
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('show');
+            editingIndex = null;
+        }
+
+        // ===============================
+        // SAVE RECORD
+        // ===============================
+        document.getElementById('recordForm').addEventListener('submit', e => {
+            e.preventDefault();
+
+            const fd = new FormData(e.target);
+            const obj = {};
+            configs[currentType].fields.forEach(f => obj[f[0]] = fd.get(f[0]) || '');
+
+            if (currentType === 'units') obj.unitPrice = Number(obj.unitPrice || 0);
+            if (currentType === 'rentals') obj.unitPrice = Number(obj.unitPrice || 0);
+            if (currentType === 'transactions') {
+                obj.price = Number(obj.price || 0);
+                obj.balance = Number(obj.balance || 0);
+            }
+
+            // Prevent a client from linking records belonging to another client.
+            if (currentType === 'rentals') {
+                const unit = getMyRecords('units').map(x => x.record).find(x => x.unitId === obj.unitId);
+                const tenant = getMyRecords('tenants').map(x => x.record).find(x => x.tenantId === obj.tenantId);
+                if (!unit || !tenant) {
+                    toast('You can only use your own units and tenants.');
+                    return;
+                }
+            }
+
+            if (currentType === 'transactions') {
+                const rental = getMyRecords('rentals').map(x => x.record).find(x => x.rentalId === obj.rentalId);
+                if (!rental) {
+                    toast('You can only use your own rentals.');
+                    return;
+                }
+            }
+
+            // Every record created by this dashboard belongs to this client.
+            obj.ownerEmail = loggedInEmail;
+
+            if (editingIndex === null) {
+                db[currentType].push(obj);
+            } else {
+                const existing = getMyRecord(currentType, editingIndex);
+                if (!existing) {
+                    toast('You cannot modify this record.');
+                    return;
+                }
+                db[currentType][editingIndex] = { ...obj, ownerEmail: existing.ownerEmail };
+            }
+
+            const wasEditing = editingIndex !== null;
+            saveDB();
+            closeModal();
+            toast(wasEditing ? 'Record updated successfully' : 'Record added successfully');
+        });
+
+        // ===============================
+        // DELETE
+        // ===============================
+        function deleteRecord(type, index) {
+            if (!getMyRecord(type, index)) {
+                toast('You cannot delete this record.');
+                return;
+            }
+            if (!confirm('Delete this record? This action cannot be undone.')) return;
+            db[type].splice(index, 1);
+            saveDB();
+            toast('Record deleted');
+        }
+
+        function toast(msg) {
+            document.getElementById('toastText').textContent = msg;
+            const t = document.getElementById('toast');
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        // ===============================
+        // EVENTS
+        // ===============================
+        document.querySelectorAll('.nav button').forEach(b =>
+            b.addEventListener('click', () => showPage(b.dataset.page))
+        );
+
+        ['units', 'tenants', 'rentals', 'transactions'].forEach(type =>
+            document.getElementById('search-' + type).addEventListener('input', e => renderTable(type, e.target.value))
+        );
+
+        document.getElementById('globalAdd').addEventListener('click', () => {
+            const active = document.querySelector('.page.active').id.replace('page-', '');
+            openModal(active === 'dashboard' ? 'units' : active);
+        });
+
+        document.getElementById('modalOverlay').addEventListener('click', e => {
+            if (e.target.id === 'modalOverlay') closeModal();
+        });
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            if (!confirm('Sign out and return to the login page?')) return;
+            localStorage.removeItem('rentflow_logged_in');
+            localStorage.removeItem('rentflow_user_email');
+            localStorage.removeItem('rentflow_user_role');
+            window.location.href = 'Login.html';
+        });
+
+        // ===============================
+        // USER DISPLAY
+        // ===============================
+        const userName = loggedInEmail.split('@')[0];
+        document.getElementById('userEmail').textContent = loggedInEmail;
+        document.getElementById('userName').textContent = userName;
+        document.getElementById('avatar').textContent = userName
+            .split(/[._\s-]+/)
+            .filter(Boolean)
+            .slice(0, 2)
+            .map(part => part.charAt(0).toUpperCase())
+            .join('') || 'CL';
+
+        document.getElementById('today').textContent =
+            new Intl.DateTimeFormat('en-PH', { dateStyle: 'medium' }).format(new Date());
+
+        renderAll();
+    </script>
+</body>
+
+</html>

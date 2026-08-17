@@ -1,0 +1,2822 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RentFlow — Admin Dashboard</title>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+        :root {
+            --bg: #090d18;
+            --panel: #121829;
+            --panel2: #171e31;
+            --line: rgba(255, 255, 255, .09);
+            --text: #f5f6fb;
+            --muted: #8f98ad;
+            --purple: #7867f7;
+            --purple2: #9d91ff;
+            --cyan: #55dfd1;
+            --red: #ff6f7d;
+            --yellow: #ffc96b;
+            --green: #63e6a5;
+            --font: 'Inter', sans-serif;
+            --display: 'Space Grotesk', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--text);
+            font-family: var(--font);
+            background:
+                radial-gradient(circle at 0% 0%, rgba(120, 103, 247, .20), transparent 30%),
+                radial-gradient(circle at 100% 100%, rgba(85, 223, 209, .12), transparent 25%),
+                var(--bg);
+        }
+
+        button,
+        input,
+        select {
+            font: inherit
+        }
+
+        button {
+            cursor: pointer
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: 255px;
+            padding: 24px 15px;
+            background: rgba(10, 14, 27, .92);
+            border-right: 1px solid var(--line);
+            backdrop-filter: blur(20px);
+            z-index: 20;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 3px 10px 28px;
+        }
+
+        .logo {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: linear-gradient(135deg, var(--purple), var(--cyan));
+            box-shadow: 0 12px 30px rgba(120, 103, 247, .28);
+        }
+
+        .logo svg {
+            width: 21px
+        }
+
+        .brand-title {
+            font-family: var(--display);
+            font-weight: 700;
+        }
+
+        .brand-sub {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 3px;
+        }
+
+        .section-label {
+            padding: 0 12px 9px;
+            color: #5e687d;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        .nav {
+            display: grid;
+            gap: 5px;
+        }
+
+        .nav button {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            border-radius: 11px;
+            padding: 11px 12px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            text-align: left;
+            transition: .2s;
+        }
+
+        .nav button:hover,
+        .nav button.active {
+            color: #fff;
+            background: rgba(120, 103, 247, .13);
+        }
+
+        .nav button.active {
+            box-shadow: inset 3px 0 var(--purple);
+        }
+
+        .nav-icon {
+            width: 18px;
+            text-align: center;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            left: 15px;
+            right: 15px;
+            bottom: 20px;
+        }
+
+        .admin-card {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 11px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: rgba(255, 255, 255, .035);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--purple), #4acfc2);
+            font-weight: 800;
+            font-size: 12px;
+        }
+
+        .admin-card b {
+            display: block;
+            font-size: 12px
+        }
+
+        .admin-card span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 3px
+        }
+
+        .logout {
+            width: 100%;
+            margin-top: 8px;
+            padding: 9px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            color: var(--muted);
+            background: transparent;
+        }
+
+        .logout:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, .06);
+        }
+
+        .main {
+            width: calc(100% - 255px);
+            margin-left: 255px;
+            padding: 30px;
+            max-width: 1650px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .eyebrow {
+            color: var(--cyan);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: .14em;
+        }
+
+        h1 {
+            font-family: var(--display);
+            font-size: 30px;
+            margin: 5px 0;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .date-chip,
+        .role-chip {
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, .035);
+            font-size: 11px;
+        }
+
+        .role-chip {
+            color: var(--purple2);
+            background: rgba(120, 103, 247, .09);
+        }
+
+        .primary {
+            border: 0;
+            border-radius: 10px;
+            padding: 11px 15px;
+            color: #fff;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--purple), #6255df);
+            box-shadow: 0 12px 25px rgba(120, 103, 247, .22);
+        }
+
+        .primary:hover {
+            filter: brightness(1.08)
+        }
+
+        .secondary {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 10px 13px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, .035);
+        }
+
+        .secondary:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, .07);
+        }
+
+        .notice {
+            padding: 13px 15px;
+            margin-bottom: 18px;
+            border-radius: 13px;
+            border: 1px solid rgba(85, 223, 209, .22);
+            background: rgba(85, 223, 209, .06);
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .notice strong {
+            color: var(--cyan)
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 13px;
+            margin-bottom: 18px;
+        }
+
+        .stat {
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, .045);
+        }
+
+        .stat small {
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .stat strong {
+            display: block;
+            margin: 11px 0 4px;
+            font: 700 25px var(--display);
+        }
+
+        .stat span {
+            color: #697388;
+            font-size: 10px;
+        }
+
+        .card {
+            overflow: hidden;
+            border: 1px solid var(--line);
+            border-radius: 17px;
+            background: rgba(255, 255, 255, .043);
+            box-shadow: 0 22px 60px rgba(0, 0, 0, .18);
+        }
+
+        .card-head {
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .card-head h2 {
+            margin: 0;
+            font: 700 18px var(--display);
+        }
+
+        .card-head p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        .search {
+            width: 250px;
+        }
+
+        .search input {
+            width: 100%;
+            padding: 10px 12px;
+            color: #fff;
+            background: rgba(255, 255, 255, .035);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            outline: 0;
+            font-size: 11px;
+        }
+
+        .search input:focus {
+            border-color: var(--purple2);
+            box-shadow: 0 0 0 3px rgba(120, 103, 247, .12);
+        }
+
+        .page {
+            display: none
+        }
+
+        .page.active {
+            display: block
+        }
+
+        .table-wrap {
+            overflow: auto
+        }
+
+        table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px 16px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, .055);
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        th {
+            color: #606a7e;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            background: rgba(255, 255, 255, .015);
+        }
+
+        td {
+            color: #d6d9e2
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, .018)
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 8px;
+            border-radius: 999px;
+            background: rgba(85, 223, 209, .09);
+            color: var(--cyan);
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .badge.purple {
+            color: var(--purple2);
+            background: rgba(120, 103, 247, .11);
+        }
+
+        .badge.yellow {
+            color: var(--yellow);
+            background: rgba(255, 201, 107, .10);
+        }
+
+        .badge.red {
+            color: var(--red);
+            background: rgba(255, 111, 125, .10);
+        }
+
+        .actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .icon-btn {
+            width: 29px;
+            height: 29px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, .03);
+        }
+
+        .icon-btn:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, .08);
+        }
+
+        .icon-btn.delete:hover {
+            color: var(--red)
+        }
+
+        .empty {
+            text-align: center;
+            padding: 45px 20px;
+            color: var(--muted);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.5fr .75fr;
+            gap: 18px;
+        }
+
+        .client-list {
+            padding: 6px 18px 15px;
+        }
+
+        .client-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .055);
+        }
+
+        .client-row:last-child {
+            border-bottom: 0
+        }
+
+        .client-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .client-avatar {
+            width: 35px;
+            height: 35px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            color: var(--purple2);
+            background: rgba(120, 103, 247, .11);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .client-info b {
+            display: block;
+            font-size: 12px
+        }
+
+        .client-info span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            margin-top: 3px
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: rgba(2, 4, 10, .75);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-overlay.show {
+            display: flex
+        }
+
+        .modal {
+            width: min(700px, 100%);
+            max-height: 90vh;
+            overflow: auto;
+            border: 1px solid var(--line);
+            border-radius: 19px;
+            background: #151b2d;
+            box-shadow: 0 35px 100px rgba(0, 0, 0, .55);
+        }
+
+        .modal-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 19px 21px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .modal-head h3 {
+            margin: 0;
+            font: 700 18px var(--display);
+        }
+
+        .close {
+            width: 31px;
+            height: 31px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            color: var(--muted);
+            background: transparent;
+            font-size: 18px;
+        }
+
+        .form {
+            padding: 20px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .field.full {
+            grid-column: 1/-1
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 7px;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 11px 12px;
+            color: #fff;
+            background: rgba(255, 255, 255, .045);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            outline: 0;
+            font-size: 11px;
+        }
+
+        .field select option {
+            background: #151b2d
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: var(--purple2);
+            box-shadow: 0 0 0 3px rgba(120, 103, 247, .12);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .toast {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 200;
+            padding: 12px 15px;
+            border: 1px solid rgba(85, 223, 209, .25);
+            border-radius: 11px;
+            background: #182137;
+            box-shadow: 0 20px 55px rgba(0, 0, 0, .35);
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+            transition: .25s;
+            font-size: 11px;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: none;
+        }
+
+        .toast strong {
+            color: var(--cyan)
+        }
+
+        @media(max-width:1200px) {
+            .stats {
+                grid-template-columns: repeat(3, 1fr)
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        @media(max-width:800px) {
+            .sidebar {
+                width: 72px;
+                padding: 18px 9px
+            }
+
+            .brand {
+                justify-content: center;
+                padding-bottom: 25px
+            }
+
+            .brand>div:last-child,
+            .section-label,
+            .nav button span:last-child,
+            .admin-card>div:last-child,
+            .logout {
+                display: none
+            }
+
+            .nav button {
+                justify-content: center
+            }
+
+            .admin-card {
+                justify-content: center
+            }
+
+            .sidebar-bottom {
+                left: 9px;
+                right: 9px
+            }
+
+            .main {
+                margin-left: 72px;
+                width: calc(100% - 72px);
+                padding: 20px
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+
+        @media(max-width:580px) {
+            .main {
+                padding: 14px
+            }
+
+            .topbar {
+                align-items: flex-start
+            }
+
+            .date-chip {
+                display: none
+            }
+
+            h1 {
+                font-size: 24px
+            }
+
+            .top-actions {
+                flex-wrap: wrap;
+                justify-content: flex-end
+            }
+
+            .stats {
+                grid-template-columns: 1fr
+            }
+
+            .card-head {
+                align-items: flex-start;
+                flex-direction: column
+            }
+
+            .search {
+                width: 100%
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr
+            }
+
+            .field.full {
+                grid-column: auto
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app">
+
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="logo">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" fill="white" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="brand-title">RentFlow</div>
+                    <span class="brand-sub">Admin Console</span>
+                </div>
+            </div>
+
+            <div class="section-label">Administration</div>
+
+            <nav class="nav">
+                <button class="active" data-page="dashboard">
+                    <span class="nav-icon">▦</span><span>Overview</span>
+                </button>
+
+                <button data-page="clients">
+                    <span class="nav-icon">◎</span><span>Clients</span>
+                </button>
+
+                <button data-page="units">
+                    <span class="nav-icon">⌂</span><span>All Units</span>
+                </button>
+
+                <button data-page="tenants">
+                    <span class="nav-icon">◉</span><span>All Tenants</span>
+                </button>
+
+                <button data-page="rentals">
+                    <span class="nav-icon">↗</span><span>All Rentals</span>
+                </button>
+
+                <button data-page="transactions">
+                    <span class="nav-icon">₱</span><span>All Transactions</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-bottom">
+                <div class="admin-card">
+                    <div class="avatar">AD</div>
+                    <div>
+                        <b>Administrator</b>
+                        <span id="adminEmail">admin@rentflow.com</span>
+                    </div>
+                </div>
+
+                <button class="logout" id="logoutBtn">Sign out</button>
+            </div>
+
+        </aside>
+
+
+        <main class="main">
+
+            <header class="topbar">
+                <div>
+                    <div class="eyebrow">Administrator</div>
+                    <h1 id="pageTitle">Admin Dashboard</h1>
+                    <p class="subtitle" id="pageSubtitle">
+                        Manage every client and every rental record from one place.
+                    </p>
+                </div>
+
+                <div class="top-actions">
+                    <div class="date-chip" id="today"></div>
+                    <div class="role-chip">ADMIN ACCESS</div>
+                    <button class="primary" id="addButton">+ Add record</button>
+                </div>
+            </header>
+
+
+            <div class="notice">
+                <strong>Admin access:</strong>
+                You can view and manage records belonging to every client.
+                Client dashboards must only display records assigned to their own account.
+            </div>
+
+
+            <!-- DASHBOARD -->
+            <section class="page active" id="page-dashboard">
+
+                <div class="stats">
+
+                    <div class="stat">
+                        <small>Total Clients</small>
+                        <strong id="totalClients">0</strong>
+                        <span>Registered client accounts</span>
+                    </div>
+
+                    <div class="stat">
+                        <small>Total Units</small>
+                        <strong id="totalUnits">0</strong>
+                        <span>Across all clients</span>
+                    </div>
+
+                    <div class="stat">
+                        <small>Total Tenants</small>
+                        <strong id="totalTenants">0</strong>
+                        <span>Across all clients</span>
+                    </div>
+
+                    <div class="stat">
+                        <small>Total Rentals</small>
+                        <strong id="totalRentals">0</strong>
+                        <span>Active and historical</span>
+                    </div>
+
+                    <div class="stat">
+                        <small>Total Balance</small>
+                        <strong id="totalBalance">₱0.00</strong>
+                        <span>Outstanding balances</span>
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-grid">
+
+                    <div class="card">
+
+                        <div class="card-head">
+                            <div>
+                                <h2>Client accounts</h2>
+                                <p>Overview of every client represented in the records.</p>
+                            </div>
+
+                            <button class="secondary" onclick="showPage('clients')">
+                                View all
+                            </button>
+                        </div>
+
+                        <div class="client-list" id="clientPreview"></div>
+
+                    </div>
+
+
+                    <div class="card">
+
+                        <div class="card-head">
+                            <div>
+                                <h2>Recent transactions</h2>
+                                <p>Latest transaction activity.</p>
+                            </div>
+                        </div>
+
+                        <div class="client-list" id="transactionPreview"></div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- CLIENTS -->
+            <section class="page" id="page-clients">
+
+                <div class="card">
+
+                    <div class="card-head">
+                        <div>
+                            <h2>Client Accounts</h2>
+                            <p>Each client account is the ownership boundary for its records.</p>
+                        </div>
+
+                        <div class="top-actions">
+                            <div class="search">
+                                <input id="clientSearch" placeholder="Search client email...">
+                            </div>
+
+                            <button class="primary" onclick="openClientModal()">
+                                + Add client
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Client ID</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Units</th>
+                                    <th>Tenants</th>
+                                    <th>Rentals</th>
+                                    <th>Transactions</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="clientsTable"></tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- UNITS -->
+            <section class="page" id="page-units">
+
+                <div class="card">
+
+                    <div class="card-head">
+
+                        <div>
+                            <h2>All Units</h2>
+                            <p>All units belonging to every client account.</p>
+                        </div>
+
+                        <div class="top-actions">
+                            <div class="search">
+                                <input id="unitSearch" placeholder="Search units...">
+                            </div>
+
+                            <button class="primary" onclick="openRecordModal('units')">
+                                + Add unit
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Unit ID</th>
+                                    <th>Room Number</th>
+                                    <th>Type</th>
+                                    <th>Unit Price</th>
+                                    <th>Client Account</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="unitsTable"></tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- TENANTS -->
+            <section class="page" id="page-tenants">
+
+                <div class="card">
+
+                    <div class="card-head">
+
+                        <div>
+                            <h2>All Tenants</h2>
+                            <p>All tenants associated with client accounts.</p>
+                        </div>
+
+                        <div class="top-actions">
+                            <div class="search">
+                                <input id="tenantSearch" placeholder="Search tenants...">
+                            </div>
+
+                            <button class="primary" onclick="openRecordModal('tenants')">
+                                + Add tenant
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tenant ID</th>
+                                    <th>Full Name</th>
+                                    <th>Contact</th>
+                                    <th>Works</th>
+                                    <th>Pets</th>
+                                    <th>Client Account</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="tenantsTable"></tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- RENTALS -->
+            <section class="page" id="page-rentals">
+
+                <div class="card">
+
+                    <div class="card-head">
+
+                        <div>
+                            <h2>All Rentals</h2>
+                            <p>All rental contracts across every client.</p>
+                        </div>
+
+                        <div class="top-actions">
+                            <div class="search">
+                                <input id="rentalSearch" placeholder="Search rentals...">
+                            </div>
+
+                            <button class="primary" onclick="openRecordModal('rentals')">
+                                + Add rental
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Rental ID</th>
+                                    <th>Unit ID</th>
+                                    <th>Tenant ID</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
+                                    <th>Unit Price</th>
+                                    <th>Client Account</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="rentalsTable"></tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- TRANSACTIONS -->
+            <section class="page" id="page-transactions">
+
+                <div class="card">
+
+                    <div class="card-head">
+
+                        <div>
+                            <h2>All Transactions</h2>
+                            <p>All payments and outstanding balances.</p>
+                        </div>
+
+                        <div class="top-actions">
+                            <div class="search">
+                                <input id="transactionSearch" placeholder="Search transactions...">
+                            </div>
+
+                            <button class="primary" onclick="openRecordModal('transactions')">
+                                + Add transaction
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <div class="table-wrap">
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Transaction ID</th>
+                                    <th>Rental ID</th>
+                                    <th>Price</th>
+                                    <th>Current Balance</th>
+                                    <th>Client Account</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody id="transactionsTable"></tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+
+    <!-- RECORD MODAL -->
+    <div class="modal-overlay" id="recordModal">
+
+        <div class="modal">
+
+            <div class="modal-head">
+                <h3 id="recordModalTitle">Add record</h3>
+                <button class="close" onclick="closeModal('recordModal')">×</button>
+            </div>
+
+            <form class="form" id="recordForm">
+
+                <div class="form-grid" id="recordFields"></div>
+
+                <div class="form-actions">
+                    <button type="button" class="secondary" onclick="closeModal('recordModal')">
+                        Cancel
+                    </button>
+
+                    <button class="primary">
+                        Save record
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- CLIENT MODAL -->
+    <div class="modal-overlay" id="clientModal">
+
+        <div class="modal">
+
+            <div class="modal-head">
+                <h3>Add Client Account</h3>
+                <button class="close" onclick="closeModal('clientModal')">×</button>
+            </div>
+
+            <form class="form" id="clientForm">
+
+                <div class="form-grid">
+
+                    <div class="field">
+                        <label>Client ID</label>
+                        <input name="clientId" required placeholder="CLIENT-001">
+                    </div>
+
+                    <div class="field">
+                        <label>Full Name</label>
+                        <input name="fullName" required placeholder="Janeer Castillo">
+                    </div>
+
+                    <div class="field full">
+                        <label>Email / Login Account</label>
+                        <input name="email" type="email" required placeholder="janeer@example.com">
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="secondary" onclick="closeModal('clientModal')">
+                        Cancel
+                    </button>
+
+                    <button class="primary">
+                        Create client
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <div class="toast" id="toast">
+        ✓ <strong id="toastMessage">Saved</strong>
+    </div>
+
+
+    <script>
+        /*
+          ==========================================================
+          RENTFLOW ADMIN DASHBOARD
+          ==========================================================
+        
+          This dashboard uses the same localStorage database key
+          as the client dashboard:
+        
+              rentflow_secure_records_v2
+        
+          Ownership is determined by:
+        
+              record.ownerEmail
+        
+          Example:
+        
+              Janeer:
+              ownerEmail = "janeer@example.com"
+        
+          Therefore the client dashboard should filter records by
+          the logged-in email, while this admin dashboard shows all.
+        */
+
+
+        const DB_KEY = "rentflow_secure_records_v2";
+
+        const ADMIN_EMAIL = "admin@rentflow.com";
+
+        const EMPTY_DB = {
+            clients: [],
+            units: [],
+            tenants: [],
+            rentals: [],
+            transactions: []
+        };
+
+        let db = loadDatabase();
+
+        let currentRecordType = "";
+        let currentEditIndex = -1;
+
+
+        // ----------------------------------------------------------
+        // DATABASE
+        // ----------------------------------------------------------
+
+        function loadDatabase() {
+
+            try {
+
+                const saved = JSON.parse(
+                    localStorage.getItem(DB_KEY) || "{}"
+                );
+
+                return {
+                    ...EMPTY_DB,
+                    ...saved,
+                    clients: saved.clients || [],
+                    units: saved.units || [],
+                    tenants: saved.tenants || [],
+                    rentals: saved.rentals || [],
+                    transactions: saved.transactions || []
+                };
+
+            } catch (error) {
+
+                return structuredClone(EMPTY_DB);
+
+            }
+
+        }
+
+
+        function saveDatabase() {
+
+            localStorage.setItem(
+                DB_KEY,
+                JSON.stringify(db)
+            );
+
+        }
+
+
+        // ----------------------------------------------------------
+        // HELPERS
+        // ----------------------------------------------------------
+
+        function escapeHTML(value) {
+
+            return String(value ?? "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+
+
+        function money(value) {
+
+            return "₱" +
+                Number(value || 0).toLocaleString(
+                    "en-PH",
+                    {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    }
+                );
+
+        }
+
+
+        function showToast(message) {
+
+            const toast = document.getElementById("toast");
+
+            document.getElementById("toastMessage")
+                .textContent = message;
+
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 2200);
+
+        }
+
+
+        function closeModal(id) {
+
+            document.getElementById(id)
+                .classList.remove("show");
+
+        }
+
+
+        // ----------------------------------------------------------
+        // ADMIN ACCESS CHECK
+        // ----------------------------------------------------------
+
+        const loggedEmail =
+            (
+                localStorage.getItem("rentflow_user_email") || ""
+            ).trim().toLowerCase();
+
+
+        document.getElementById("adminEmail").textContent =
+            loggedEmail || ADMIN_EMAIL;
+
+
+        /*
+          For this local prototype, only the configured admin email
+          can use this page.
+        
+          Change ADMIN_EMAIL if your admin account uses another email.
+        */
+
+        if (
+            loggedEmail &&
+            loggedEmail !== ADMIN_EMAIL
+        ) {
+
+            alert(
+                "Administrator access required. " +
+                "This account is not an admin account."
+            );
+
+            window.location.href = "dashboard.html";
+
+        }
+
+
+        // ----------------------------------------------------------
+        // CLIENT HELPERS
+        // ----------------------------------------------------------
+
+        function getClientEmails() {
+
+            const emails = new Set();
+
+            db.clients.forEach(client => {
+
+                if (client.email) {
+                    emails.add(
+                        client.email.toLowerCase()
+                    );
+                }
+
+            });
+
+            [
+                "units",
+                "tenants",
+                "rentals",
+                "transactions"
+            ].forEach(type => {
+
+                db[type].forEach(record => {
+
+                    if (record.ownerEmail) {
+
+                        emails.add(
+                            record.ownerEmail.toLowerCase()
+                        );
+
+                    }
+
+                });
+
+            });
+
+            return [...emails];
+
+        }
+
+
+        function getClient(email) {
+
+            return db.clients.find(
+                client =>
+                    client.email.toLowerCase() ===
+                    email.toLowerCase()
+            );
+
+        }
+
+
+        function clientStats(email) {
+
+            const e = email.toLowerCase();
+
+            return {
+
+                units:
+                    db.units.filter(
+                        x => String(x.ownerEmail).toLowerCase() === e
+                    ).length,
+
+                tenants:
+                    db.tenants.filter(
+                        x => String(x.ownerEmail).toLowerCase() === e
+                    ).length,
+
+                rentals:
+                    db.rentals.filter(
+                        x => String(x.ownerEmail).toLowerCase() === e
+                    ).length,
+
+                transactions:
+                    db.transactions.filter(
+                        x => String(x.ownerEmail).toLowerCase() === e
+                    ).length
+
+            };
+
+        }
+
+
+        // ----------------------------------------------------------
+        // NAVIGATION
+        // ----------------------------------------------------------
+
+        function showPage(page) {
+
+            document.querySelectorAll(".page")
+                .forEach(section =>
+                    section.classList.remove("active")
+                );
+
+            document.getElementById(
+                "page-" + page
+            ).classList.add("active");
+
+
+            document.querySelectorAll(".nav button")
+                .forEach(button =>
+                    button.classList.toggle(
+                        "active",
+                        button.dataset.page === page
+                    )
+                );
+
+
+            const titles = {
+
+                dashboard: [
+                    "Admin Dashboard",
+                    "Manage every client and every rental record."
+                ],
+
+                clients: [
+                    "Client Accounts",
+                    "Create and manage client ownership boundaries."
+                ],
+
+                units: [
+                    "All Units",
+                    "View every unit belonging to every client."
+                ],
+
+                tenants: [
+                    "All Tenants",
+                    "View every tenant across all accounts."
+                ],
+
+                rentals: [
+                    "All Rentals",
+                    "View every rental contract."
+                ],
+
+                transactions: [
+                    "All Transactions",
+                    "View payments and outstanding balances."
+                ]
+
+            };
+
+
+            document.getElementById("pageTitle")
+                .textContent = titles[page][0];
+
+            document.getElementById("pageSubtitle")
+                .textContent = titles[page][1];
+
+        }
+
+
+        document.querySelectorAll(".nav button")
+            .forEach(button => {
+
+                button.addEventListener(
+                    "click",
+                    () => showPage(button.dataset.page)
+                );
+
+            });
+
+
+        // ----------------------------------------------------------
+        // DASHBOARD
+        // ----------------------------------------------------------
+
+        function renderDashboard() {
+
+            const clients = getClientEmails();
+
+            document.getElementById("totalClients")
+                .textContent = clients.length;
+
+            document.getElementById("totalUnits")
+                .textContent = db.units.length;
+
+            document.getElementById("totalTenants")
+                .textContent = db.tenants.length;
+
+            document.getElementById("totalRentals")
+                .textContent = db.rentals.length;
+
+
+            const balance = db.transactions.reduce(
+                (total, transaction) =>
+                    total + Number(transaction.balance || 0),
+                0
+            );
+
+            document.getElementById("totalBalance")
+                .textContent = money(balance);
+
+
+            renderClientPreview();
+            renderTransactionPreview();
+
+        }
+
+
+        function renderClientPreview() {
+
+            const container =
+                document.getElementById("clientPreview");
+
+            const emails = getClientEmails();
+
+            if (!emails.length) {
+
+                container.innerHTML =
+                    `<div class="empty">
+        No client accounts yet.
+      </div>`;
+
+                return;
+            }
+
+
+            container.innerHTML =
+                emails.slice(0, 8).map(email => {
+
+                    const client = getClient(email);
+                    const stats = clientStats(email);
+
+                    const name =
+                        client?.fullName ||
+                        email.split("@")[0];
+
+                    const initials =
+                        name
+                            .split(" ")
+                            .map(x => x[0])
+                            .join("")
+                            .slice(0, 2)
+                            .toUpperCase();
+
+
+                    return `
+        <div class="client-row">
+
+          <div class="client-info">
+
+            <div class="client-avatar">
+              ${escapeHTML(initials)}
+            </div>
+
+            <div>
+              <b>${escapeHTML(name)}</b>
+              <span>${escapeHTML(email)}</span>
+            </div>
+
+          </div>
+
+          <div>
+            <span class="badge purple">
+              ${stats.units} unit${stats.units === 1 ? "" : "s"}
+            </span>
+          </div>
+
+        </div>
+      `;
+
+                }).join("");
+
+        }
+
+
+        function renderTransactionPreview() {
+
+            const container =
+                document.getElementById(
+                    "transactionPreview"
+                );
+
+            const list =
+                [...db.transactions]
+                    .reverse()
+                    .slice(0, 6);
+
+
+            if (!list.length) {
+
+                container.innerHTML =
+                    `<div class="empty">
+        No transactions yet.
+      </div>`;
+
+                return;
+
+            }
+
+
+            container.innerHTML =
+                list.map(transaction => {
+
+                    const client =
+                        getClient(
+                            transaction.ownerEmail || ""
+                        );
+
+                    const name =
+                        client?.fullName ||
+                        transaction.ownerEmail ||
+                        "Unknown";
+
+
+                    return `
+        <div class="client-row">
+
+          <div class="client-info">
+
+            <div class="client-avatar">
+              ₱
+            </div>
+
+            <div>
+              <b>${escapeHTML(transaction.transactionId || "Transaction")}</b>
+              <span>${escapeHTML(name)}</span>
+            </div>
+
+          </div>
+
+          <span class="badge ${Number(transaction.balance || 0) > 0
+                            ? "yellow"
+                            : ""
+                        }">
+            ${money(transaction.balance || 0)}
+          </span>
+
+        </div>
+      `;
+
+                }).join("");
+
+        }
+
+
+        // ----------------------------------------------------------
+        // CLIENT TABLE
+        // ----------------------------------------------------------
+
+        function renderClients(search = "") {
+
+            const query = search.toLowerCase();
+
+            const emails = getClientEmails()
+                .filter(email =>
+                    email.includes(query)
+                );
+
+
+            const table =
+                document.getElementById("clientsTable");
+
+
+            if (!emails.length) {
+
+                table.innerHTML =
+                    `<tr>
+        <td colspan="9" class="empty">
+          No clients found.
+        </td>
+      </tr>`;
+
+                return;
+
+            }
+
+
+            table.innerHTML =
+                emails.map((email, index) => {
+
+                    const client = getClient(email);
+                    const stats = clientStats(email);
+
+                    const name =
+                        client?.fullName ||
+                        email.split("@")[0];
+
+
+                    return `
+        <tr>
+
+          <td>
+            <b>${escapeHTML(
+                        client?.clientId ||
+                        "CLIENT-" + String(index + 1).padStart(3, "0")
+                    )}</b>
+          </td>
+
+          <td>${escapeHTML(name)}</td>
+
+          <td>${escapeHTML(email)}</td>
+
+          <td>${stats.units}</td>
+          <td>${stats.tenants}</td>
+          <td>${stats.rentals}</td>
+          <td>${stats.transactions}</td>
+
+          <td>
+            <span class="badge">
+              Active
+            </span>
+          </td>
+
+          <td>
+            <div class="actions">
+              <button
+                class="icon-btn delete"
+                onclick="deleteClient('${escapeHTML(email)}')"
+                title="Delete client">
+                ×
+              </button>
+            </div>
+          </td>
+
+        </tr>
+      `;
+
+                }).join("");
+
+        }
+
+
+        // ----------------------------------------------------------
+        // RECORD TABLES
+        // ----------------------------------------------------------
+
+        function renderUnits(search = "") {
+
+            const query = search.toLowerCase();
+
+            const rows =
+                db.units
+                    .map((record, index) => ({ record, index }))
+                    .filter(x =>
+                        JSON.stringify(x.record)
+                            .toLowerCase()
+                            .includes(query)
+                    );
+
+
+            const table =
+                document.getElementById("unitsTable");
+
+
+            if (!rows.length) {
+
+                table.innerHTML =
+                    `<tr>
+        <td colspan="6" class="empty">
+          No unit records found.
+        </td>
+      </tr>`;
+
+                return;
+
+            }
+
+
+            table.innerHTML =
+                rows.map(({ record, index }) => `
+
+      <tr>
+
+        <td><b>${escapeHTML(record.unitId)}</b></td>
+
+        <td>${escapeHTML(record.roomNumber)}</td>
+
+        <td>
+          <span class="badge purple">
+            ${escapeHTML(record.roomType)}
+          </span>
+        </td>
+
+        <td>${money(record.unitPrice)}</td>
+
+        <td>
+          ${escapeHTML(record.ownerEmail || "Unassigned")}
+        </td>
+
+        <td>
+          ${recordActions("units", index)}
+        </td>
+
+      </tr>
+
+    `).join("");
+
+        }
+
+
+        function renderTenants(search = "") {
+
+            const query = search.toLowerCase();
+
+            const rows =
+                db.tenants
+                    .map((record, index) => ({ record, index }))
+                    .filter(x =>
+                        JSON.stringify(x.record)
+                            .toLowerCase()
+                            .includes(query)
+                    );
+
+
+            const table =
+                document.getElementById("tenantsTable");
+
+
+            if (!rows.length) {
+
+                table.innerHTML =
+                    `<tr>
+        <td colspan="7" class="empty">
+          No tenant records found.
+        </td>
+      </tr>`;
+
+                return;
+
+            }
+
+
+            table.innerHTML =
+                rows.map(({ record, index }) => `
+
+      <tr>
+
+        <td><b>${escapeHTML(record.tenantId)}</b></td>
+
+        <td>${escapeHTML(record.fullName)}</td>
+
+        <td>${escapeHTML(record.contact)}</td>
+
+        <td>${escapeHTML(record.works)}</td>
+
+        <td>${escapeHTML(record.pets)}</td>
+
+        <td>${escapeHTML(record.ownerEmail || "Unassigned")}</td>
+
+        <td>${recordActions("tenants", index)}</td>
+
+      </tr>
+
+    `).join("");
+
+        }
+
+
+        function renderRentals(search = "") {
+
+            const query = search.toLowerCase();
+
+            const rows =
+                db.rentals
+                    .map((record, index) => ({ record, index }))
+                    .filter(x =>
+                        JSON.stringify(x.record)
+                            .toLowerCase()
+                            .includes(query)
+                    );
+
+
+            const table =
+                document.getElementById("rentalsTable");
+
+
+            if (!rows.length) {
+
+                table.innerHTML =
+                    `<tr>
+        <td colspan="8" class="empty">
+          No rental records found.
+        </td>
+      </tr>`;
+
+                return;
+
+            }
+
+
+            table.innerHTML =
+                rows.map(({ record, index }) => `
+
+      <tr>
+
+        <td><b>${escapeHTML(record.rentalId)}</b></td>
+
+        <td>${escapeHTML(record.unitId)}</td>
+
+        <td>${escapeHTML(record.tenantId)}</td>
+
+        <td>${escapeHTML(record.startDate)}</td>
+
+        <td>${escapeHTML(record.endDate)}</td>
+
+        <td>${money(record.unitPrice)}</td>
+
+        <td>${escapeHTML(record.ownerEmail || "Unassigned")}</td>
+
+        <td>${recordActions("rentals", index)}</td>
+
+      </tr>
+
+    `).join("");
+
+        }
+
+
+        function renderTransactions(search = "") {
+
+            const query = search.toLowerCase();
+
+            const rows =
+                db.transactions
+                    .map((record, index) => ({ record, index }))
+                    .filter(x =>
+                        JSON.stringify(x.record)
+                            .toLowerCase()
+                            .includes(query)
+                    );
+
+
+            const table =
+                document.getElementById("transactionsTable");
+
+
+            if (!rows.length) {
+
+                table.innerHTML =
+                    `<tr>
+        <td colspan="7" class="empty">
+          No transaction records found.
+        </td>
+      </tr>`;
+
+                return;
+
+            }
+
+
+            table.innerHTML =
+                rows.map(({ record, index }) => {
+
+                    const balance =
+                        Number(record.balance || 0);
+
+                    return `
+
+        <tr>
+
+          <td>
+            <b>${escapeHTML(record.transactionId)}</b>
+          </td>
+
+          <td>${escapeHTML(record.rentalId)}</td>
+
+          <td>${money(record.price)}</td>
+
+          <td>${money(balance)}</td>
+
+          <td>${escapeHTML(record.ownerEmail || "Unassigned")}</td>
+
+          <td>
+            <span class="badge ${balance > 0
+                            ? "yellow"
+                            : ""
+                        }">
+              ${balance > 0 ? "Balance due" : "Paid"}
+            </span>
+          </td>
+
+          <td>${recordActions("transactions", index)}</td>
+
+        </tr>
+
+      `;
+
+                }).join("");
+
+        }
+
+
+        function recordActions(type, index) {
+
+            return `
+    <div class="actions">
+
+      <button
+        class="icon-btn"
+        onclick="openRecordModal('${type}',${index})"
+        title="Edit">
+        ✎
+      </button>
+
+      <button
+        class="icon-btn delete"
+        onclick="deleteRecord('${type}',${index})"
+        title="Delete">
+        ×
+      </button>
+
+    </div>
+  `;
+
+        }
+
+
+        // ----------------------------------------------------------
+        // CLIENT MODAL
+        // ----------------------------------------------------------
+
+        function openClientModal() {
+
+            document
+                .getElementById("clientModal")
+                .classList.add("show");
+
+        }
+
+
+        document
+            .getElementById("clientForm")
+            .addEventListener("submit", function (event) {
+
+                event.preventDefault();
+
+                const data =
+                    new FormData(event.target);
+
+                const client = {
+
+                    clientId:
+                        data.get("clientId").trim(),
+
+                    fullName:
+                        data.get("fullName").trim(),
+
+                    email:
+                        data.get("email").trim().toLowerCase()
+
+                };
+
+
+                if (
+                    db.clients.some(
+                        x =>
+                            x.email.toLowerCase() ===
+                            client.email
+                    )
+                ) {
+
+                    alert("That client email already exists.");
+
+                    return;
+
+                }
+
+
+                db.clients.push(client);
+
+                saveDatabase();
+
+                closeModal("clientModal");
+
+                event.target.reset();
+
+                renderAll();
+
+                showToast("Client account created");
+
+            });
+
+
+        // ----------------------------------------------------------
+        // RECORD MODAL
+        // ----------------------------------------------------------
+
+        const recordFields = {
+
+            units: [
+                ["unitId", "Unit ID", "text"],
+                ["roomNumber", "Room Number", "text"],
+                ["roomType", "Type of Room", "text"],
+                ["unitPrice", "Unit Price", "number"],
+                ["ownerEmail", "Client Account", "client"]
+            ],
+
+            tenants: [
+                ["tenantId", "Tenant ID", "text"],
+                ["fullName", "Full Name", "text"],
+                ["contact", "Contact Number", "tel"],
+                ["works", "Works", "text"],
+                ["pets", "Pets", "text"],
+                ["ownerEmail", "Client Account", "client"]
+            ],
+
+            rentals: [
+                ["rentalId", "Rental ID", "text"],
+                ["unitId", "Unit ID", "unit"],
+                ["tenantId", "Tenant ID", "tenant"],
+                ["startDate", "Start Date", "date"],
+                ["endDate", "End Date", "date"],
+                ["unitPrice", "Unit Price", "number"],
+                ["ownerEmail", "Client Account", "client"]
+            ],
+
+            transactions: [
+                ["transactionId", "Transaction ID", "text"],
+                ["rentalId", "Rental ID", "rental"],
+                ["price", "Price", "number"],
+                ["balance", "Current Balance", "number"],
+                ["ownerEmail", "Client Account", "client"]
+            ]
+
+        };
+
+
+        function clientOptions() {
+
+            return getClientEmails()
+                .map(email => {
+
+                    const client =
+                        getClient(email);
+
+                    const label =
+                        client?.fullName
+                            ? `${client.fullName} — ${email}`
+                            : email;
+
+                    return `
+        <option value="${escapeHTML(email)}">
+          ${escapeHTML(label)}
+        </option>
+      `;
+
+                })
+                .join("");
+
+        }
+
+
+        function unitOptions() {
+
+            return db.units
+                .map(unit => `
+      <option value="${escapeHTML(unit.unitId)}">
+        ${escapeHTML(unit.unitId)}
+        — Room ${escapeHTML(unit.roomNumber)}
+      </option>
+    `)
+                .join("");
+
+        }
+
+
+        function tenantOptions() {
+
+            return db.tenants
+                .map(tenant => `
+      <option value="${escapeHTML(tenant.tenantId)}">
+        ${escapeHTML(tenant.tenantId)}
+        — ${escapeHTML(tenant.fullName)}
+      </option>
+    `)
+                .join("");
+
+        }
+
+
+        function rentalOptions() {
+
+            return db.rentals
+                .map(rental => `
+      <option value="${escapeHTML(rental.rentalId)}">
+        ${escapeHTML(rental.rentalId)}
+      </option>
+    `)
+                .join("");
+
+        }
+
+
+        function openRecordModal(type, index = -1) {
+
+            currentRecordType = type;
+            currentEditIndex = index;
+
+            document.getElementById(
+                "recordModalTitle"
+            ).textContent =
+                `${index === -1 ? "Add" : "Edit"} ${type.slice(0, -1)}`;
+
+
+            let html = "";
+
+            recordFields[type]
+                .forEach(([key, label, inputType]) => {
+
+                    if (inputType === "client") {
+
+                        html += `
+          <div class="field full">
+
+            <label>${label}</label>
+
+            <select name="${key}" required>
+              <option value="">
+                Select client account
+              </option>
+
+              ${clientOptions()}
+            </select>
+
+          </div>
+        `;
+
+                        return;
+
+                    }
+
+
+                    if (inputType === "unit") {
+
+                        html += `
+          <div class="field">
+
+            <label>${label}</label>
+
+            <select name="${key}" required>
+
+              <option value="">
+                Select unit
+              </option>
+
+              ${unitOptions()}
+
+            </select>
+
+          </div>
+        `;
+
+                        return;
+
+                    }
+
+
+                    if (inputType === "tenant") {
+
+                        html += `
+          <div class="field">
+
+            <label>${label}</label>
+
+            <select name="${key}" required>
+
+              <option value="">
+                Select tenant
+              </option>
+
+              ${tenantOptions()}
+
+            </select>
+
+          </div>
+        `;
+
+                        return;
+
+                    }
+
+
+                    if (inputType === "rental") {
+
+                        html += `
+          <div class="field">
+
+            <label>${label}</label>
+
+            <select name="${key}" required>
+
+              <option value="">
+                Select rental
+              </option>
+
+              ${rentalOptions()}
+
+            </select>
+
+          </div>
+        `;
+
+                        return;
+
+                    }
+
+
+                    html += `
+        <div class="field">
+
+          <label>${label}</label>
+
+          <input
+            name="${key}"
+            type="${inputType}"
+            ${inputType === "number" ? 'step="0.01"' : ""}
+            required
+          >
+
+        </div>
+      `;
+
+                });
+
+
+            document.getElementById(
+                "recordFields"
+            ).innerHTML = html;
+
+
+            if (index !== -1) {
+
+                const record =
+                    db[type][index];
+
+                Object.entries(record)
+                    .forEach(([key, value]) => {
+
+                        const field =
+                            document.querySelector(
+                                `#recordFields [name="${key}"]`
+                            );
+
+                        if (field) {
+                            field.value = value;
+                        }
+
+                    });
+
+            }
+
+
+            document
+                .getElementById("recordModal")
+                .classList.add("show");
+
+        }
+
+
+        document
+            .getElementById("recordForm")
+            .addEventListener("submit", function (event) {
+
+                event.preventDefault();
+
+                const data =
+                    new FormData(event.target);
+
+                const record = {};
+
+
+                recordFields[currentRecordType]
+                    .forEach(([key]) => {
+
+                        record[key] =
+                            String(
+                                data.get(key) || ""
+                            ).trim();
+
+                    });
+
+
+                if (
+                    currentRecordType === "units" ||
+                    currentRecordType === "rentals"
+                ) {
+
+                    record.unitPrice =
+                        Number(record.unitPrice || 0);
+
+                }
+
+
+                if (
+                    currentRecordType === "transactions"
+                ) {
+
+                    record.price =
+                        Number(record.price || 0);
+
+                    record.balance =
+                        Number(record.balance || 0);
+
+                }
+
+
+                if (currentEditIndex === -1) {
+
+                    db[currentRecordType]
+                        .push(record);
+
+                } else {
+
+                    db[currentRecordType]
+                    [currentEditIndex] = record;
+
+                }
+
+
+                saveDatabase();
+
+                closeModal("recordModal");
+
+                renderAll();
+
+                showToast(
+                    currentEditIndex === -1
+                        ? "Record added"
+                        : "Record updated"
+                );
+
+            });
+
+
+        // ----------------------------------------------------------
+        // DELETE
+        // ----------------------------------------------------------
+
+        function deleteRecord(type, index) {
+
+            if (
+                !confirm(
+                    "Delete this record permanently?"
+                )
+            ) {
+                return;
+            }
+
+
+            db[type].splice(index, 1);
+
+            saveDatabase();
+
+            renderAll();
+
+            showToast("Record deleted");
+
+        }
+
+
+        function deleteClient(email) {
+
+            const stats =
+                clientStats(email);
+
+
+            const total =
+                stats.units +
+                stats.tenants +
+                stats.rentals +
+                stats.transactions;
+
+
+            let message =
+                `Delete client ${email}?`;
+
+
+            if (total > 0) {
+
+                message +=
+                    `\n\nThis client currently has ` +
+                    `${total} associated record(s). ` +
+                    `Deleting the client account will NOT ` +
+                    `automatically delete those records.`;
+
+            }
+
+
+            if (!confirm(message)) {
+                return;
+            }
+
+
+            db.clients =
+                db.clients.filter(
+                    client =>
+                        client.email.toLowerCase() !==
+                        email.toLowerCase()
+                );
+
+
+            saveDatabase();
+
+            renderAll();
+
+            showToast("Client account removed");
+
+        }
+
+
+        // ----------------------------------------------------------
+        // SEARCH
+        // ----------------------------------------------------------
+
+        document
+            .getElementById("clientSearch")
+            .addEventListener(
+                "input",
+                event =>
+                    renderClients(event.target.value)
+            );
+
+
+        document
+            .getElementById("unitSearch")
+            .addEventListener(
+                "input",
+                event =>
+                    renderUnits(event.target.value)
+            );
+
+
+        document
+            .getElementById("tenantSearch")
+            .addEventListener(
+                "input",
+                event =>
+                    renderTenants(event.target.value)
+            );
+
+
+        document
+            .getElementById("rentalSearch")
+            .addEventListener(
+                "input",
+                event =>
+                    renderRentals(event.target.value)
+            );
+
+
+        document
+            .getElementById("transactionSearch")
+            .addEventListener(
+                "input",
+                event =>
+                    renderTransactions(event.target.value)
+            );
+
+
+        // ----------------------------------------------------------
+        // ADD BUTTON
+        // ----------------------------------------------------------
+
+        document
+            .getElementById("addButton")
+            .addEventListener("click", () => {
+
+                const active =
+                    document.querySelector(
+                        ".page.active"
+                    ).id.replace("page-", "");
+
+
+                if (active === "dashboard") {
+                    openClientModal();
+                    return;
+                }
+
+
+                if (active === "clients") {
+                    openClientModal();
+                    return;
+                }
+
+
+                openRecordModal(active);
+
+            });
+
+
+        // ----------------------------------------------------------
+        // SIGN OUT
+        // ----------------------------------------------------------
+
+        document
+            .getElementById("logoutBtn")
+            .addEventListener("click", () => {
+
+                localStorage.removeItem(
+                    "rentflow_logged_in"
+                );
+
+                localStorage.removeItem(
+                    "rentflow_user_email"
+                );
+
+                window.location.href =
+                    "Login.html";
+
+            });
+
+
+        // ----------------------------------------------------------
+        // CLOSE MODALS BY BACKGROUND / ESC
+        // ----------------------------------------------------------
+
+        document
+            .querySelectorAll(".modal-overlay")
+            .forEach(overlay => {
+
+                overlay.addEventListener(
+                    "click",
+                    event => {
+
+                        if (event.target === overlay) {
+                            overlay.classList.remove("show");
+                        }
+
+                    }
+                );
+
+            });
+
+
+        document.addEventListener(
+            "keydown",
+            event => {
+
+                if (event.key === "Escape") {
+
+                    document
+                        .querySelectorAll(".modal-overlay")
+                        .forEach(modal =>
+                            modal.classList.remove("show")
+                        );
+
+                }
+
+            }
+        );
+
+
+        // ----------------------------------------------------------
+        // RENDER EVERYTHING
+        // ----------------------------------------------------------
+
+        function renderAll() {
+
+            db = loadDatabase();
+
+            renderDashboard();
+
+            renderClients(
+                document.getElementById("clientSearch").value
+            );
+
+            renderUnits(
+                document.getElementById("unitSearch").value
+            );
+
+            renderTenants(
+                document.getElementById("tenantSearch").value
+            );
+
+            renderRentals(
+                document.getElementById("rentalSearch").value
+            );
+
+            renderTransactions(
+                document.getElementById("transactionSearch").value
+            );
+
+        }
+
+
+        // ----------------------------------------------------------
+        // DATE
+        // ----------------------------------------------------------
+
+        document.getElementById("today")
+            .textContent =
+            new Intl.DateTimeFormat(
+                "en-PH",
+                { dateStyle: "medium" }
+            ).format(new Date());
+
+
+        // INITIALIZE
+        renderAll();
+
+    </script>
+
+</body>
+
+</html>
